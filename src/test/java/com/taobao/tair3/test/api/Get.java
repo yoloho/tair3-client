@@ -1,12 +1,8 @@
 package com.taobao.tair3.test.api;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -104,19 +100,15 @@ public class Get extends TestBase {
 			Result<Void> r = tair.put(ns, key, val, null);
 			assertEquals(ResultCode.OK, r.getCode());
 			
-			Result<byte[]> g = tair.get(ns, null, null);
+			tair.get(ns, null, null);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.KEY_NOT_AVAILABLE, e.getMessage());
@@ -128,19 +120,15 @@ public class Get extends TestBase {
 			Result<Void> r = tair.put(ns, key, val, null);
 			assertEquals(ResultCode.OK, r.getCode());
 			
-			Result<byte[]> g = tair.get((short)-1, key, null);
+			tair.get((short)-1, key, null);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.NS_NOT_AVAILABLE, e.getMessage());
@@ -152,19 +140,15 @@ public class Get extends TestBase {
 			Result<Void> r = tair.put(ns, key, val, null);
 			assertEquals(ResultCode.OK, r.getCode());
 			
-			Result<byte[]> g = tair.get((short)TairConstant.NAMESPACE_MAX, key, null);
+			tair.get((short)TairConstant.NAMESPACE_MAX, key, null);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.NS_NOT_AVAILABLE, e.getMessage());
@@ -174,7 +158,6 @@ public class Get extends TestBase {
 	//@Test
 	public void simpleGetWithDataNotExist() {
 		byte[] key = UUID.randomUUID().toString().getBytes();
-		byte[] val = UUID.randomUUID().toString().getBytes();
 		try {
 			Result<Void> r = tair.invalidByProxy(ns, key, null);
 			assertEquals(ResultCode.OK, r.getCode());
@@ -408,7 +391,6 @@ public class Get extends TestBase {
 	public void simpleGetWithDataNotExist1() {
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
-		byte[] value = UUID.randomUUID().toString().getBytes();
 		try {
 			Result<Void> r = tair.prefixInvalidByProxy(ns, pkey, skey, null);
 			assertEquals(true, r.getCode().equals(ResultCode.NOTEXISTS) || r.getCode().equals(ResultCode.OK));

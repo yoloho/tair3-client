@@ -2,17 +2,14 @@ package com.taobao.tair3.client.packets.dataserver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.taobao.tair3.client.Result;
-import com.taobao.tair3.client.ResultMap;
 import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.TairClient.Pair;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 import com.taobao.tair3.client.util.TairConstant;
-import com.taobao.tair3.client.util.TairUtil;
 
 public class RangeResponse extends AbstractResponsePacket {
 	protected int configVersion;

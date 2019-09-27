@@ -1,7 +1,6 @@
 package com.taobao.tair3.client.rpc.net;
 
  
-import java.net.ConnectException;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -12,16 +11,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 //import com.taobao.eagleeye.EagleEye;
 //import com.taobao.eagleeye.RpcContext_inner;
-import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.error.TairAgain;
 import com.taobao.tair3.client.error.TairException;
 import com.taobao.tair3.client.rpc.net.TairRpcContext.FailCounter;
-import com.taobao.tair3.client.rpc.protocol.tair2_3.PacketHeader;
 
 public class TairFuture implements java.util.concurrent.Future<TairRpcPacket> {
 	private ReentrantLock lock = new ReentrantLock();

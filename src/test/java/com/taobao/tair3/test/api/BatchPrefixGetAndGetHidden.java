@@ -15,7 +15,6 @@ import com.taobao.tair3.client.ResultMap;
 import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.TairClient.Pair;
 import com.taobao.tair3.client.TairClient.RequestOption;
-import com.taobao.tair3.client.TairClient.RequestOption;
 import com.taobao.tair3.client.TairClient.TairOption;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
@@ -212,7 +211,7 @@ public class BatchPrefixGetAndGetHidden extends TestBase {
 		
 		
 		try {
-			ResultMap<byte[], Result<Map<byte[], Result<byte[]>>>> bpg = tair.batchPrefixGetHiddenMulti(ns, null, null);
+			tair.batchPrefixGetHiddenMulti(ns, null, null);
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
 		} catch (TairFlowLimit e) {
@@ -227,7 +226,7 @@ public class BatchPrefixGetAndGetHidden extends TestBase {
 		}
 		
 		try {
-			ResultMap<byte[], Result<Map<byte[], Result<byte[]>>>> bpg = tair.batchPrefixGetHiddenMulti((short)-1, keys, null);
+			tair.batchPrefixGetHiddenMulti((short)-1, keys, null);
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
 		} catch (TairFlowLimit e) {

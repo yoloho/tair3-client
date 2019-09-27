@@ -23,7 +23,6 @@ import com.taobao.tair3.client.util.TairConstant;
 public class PrefixHideAndGetHiddenMulti extends TestBase {
 	@Test
 	public void simplePrefixHideAndGetHiddenMulti() {
-		int keyCount = 6;
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		List<byte[]> skeys = /*this.generateKeys(keyCount)*/ new ArrayList<byte[]> ();
 		skeys.add("Key1".getBytes());

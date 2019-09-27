@@ -1,12 +1,8 @@
 package com.taobao.tair3.test.api;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -133,7 +129,6 @@ public class PrefixGet extends TestBase {
 	public void simpleGetWithDataNotExist() {
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
-		byte[] value = UUID.randomUUID().toString().getBytes();
 		try {
 			Result<Void> r = tair.prefixInvalidByProxy(ns, pkey, skey, null);
 			assertEquals(true, r.getCode().equals(ResultCode.NOTEXISTS) || r.getCode().equals(ResultCode.OK));

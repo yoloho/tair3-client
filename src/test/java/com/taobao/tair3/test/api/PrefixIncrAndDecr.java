@@ -2,12 +2,8 @@
 package com.taobao.tair3.test.api;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -28,14 +24,14 @@ public class PrefixIncrAndDecr extends TestBase {
 		try {
 			Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals((value + initValue), i.getResult());
+			assertEquals((value + initValue), i.getResult().intValue());
 			assertEquals(0, i.getVersion());
 			
 			
 			 
 			Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, opt);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals((value + initValue - value2), d.getResult());
+			assertEquals((value + initValue - value2), d.getResult().intValue());
 			assertEquals(0, d.getVersion());
 		} catch (TairRpcError e) {
 			e.printStackTrace();
@@ -54,9 +50,7 @@ public class PrefixIncrAndDecr extends TestBase {
 	
 	@Test
 	public void simpleIncrAndDecrWithIllegalParameter() {
-		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
-		int value = 10;
 		int value2 = 5;
 		int initValue = 1;
 		try {
@@ -99,7 +93,7 @@ public class PrefixIncrAndDecr extends TestBase {
 			TairOption opt = new TairOption(500000, (short)0, 2);
 			Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals((value + initValue), i.getResult());
+			assertEquals((value + initValue), i.getResult().intValue());
 			assertEquals(0, i.getVersion());
 			
 			Thread.sleep(3000);
@@ -133,7 +127,6 @@ public class PrefixIncrAndDecr extends TestBase {
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
 		byte[] val = UUID.randomUUID().toString().getBytes();
-		int value = 10;
 		int value2 = 5;
 		int initValue = 1;
 		try {
@@ -170,7 +163,6 @@ public class PrefixIncrAndDecr extends TestBase {
 	public void simpleIncrAndDecrWithSetCounter() {
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
-		int count = 0;
 		int value = 10;
 		int value2 = 5;
 		int defaultValue = 1;
@@ -180,13 +172,13 @@ public class PrefixIncrAndDecr extends TestBase {
 			
 			Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, 2, null);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals((value + defaultValue), i.getResult());
+			assertEquals((value + defaultValue), i.getResult().intValue());
 			 
 			 
 			
 			Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, defaultValue, null);
 			assertEquals(ResultCode.OK, d.getCode());
-			assertEquals((value + defaultValue - value2), d.getResult());
+			assertEquals((value + defaultValue - value2), d.getResult().intValue());
 		 
 		} catch (TairRpcError e) {
 			e.printStackTrace();

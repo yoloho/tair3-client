@@ -25,7 +25,8 @@ public class BatchGetCast implements TairResultCast<GetResponse, Result<ResultMa
 		result.setCode(code);
 		
 		
-		List<byte[]> keys = (List<byte[]>) context;
+		@SuppressWarnings("unchecked")
+        List<byte[]> keys = (List<byte[]>) context;
 		Set<byte[]> keySet = new TreeSet<byte[]>(TairUtil.BYTES_COMPARATOR);
 		keySet.addAll(keys);
 		if ((code.equals(ResultCode.OK) || code.equals(ResultCode.PART_OK)) && s.getEntrires() != null && s.getEntrires().size() > 0) {

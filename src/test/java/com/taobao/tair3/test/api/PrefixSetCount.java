@@ -1,12 +1,8 @@
 package com.taobao.tair3.test.api;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -34,11 +30,11 @@ public class PrefixSetCount extends TestBase {
 			
 			Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, defaultValue, null);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals((value + defaultValue), i.getResult());
+			assertEquals((value + defaultValue), i.getResult().intValue());
 			
 			Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value, defaultValue, opt);
 			assertEquals(ResultCode.OK, d.getCode());
-			assertEquals((defaultValue), d.getResult());
+			assertEquals((defaultValue), d.getResult().intValue());
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

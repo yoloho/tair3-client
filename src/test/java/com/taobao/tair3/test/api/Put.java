@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -61,16 +59,12 @@ public class Put extends TestBase {
 			Result<List<Pair<byte[], Result<byte[]>>>> r2 = tair.getRange(ns, key, null, null, 0, 10, false, null);
 			assertEquals(ResultCode.OK, r2.getCode());
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -79,21 +73,16 @@ public class Put extends TestBase {
 	public void simplePutWithIllegalParameter() {
 		
 		try {
-			byte[] key = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.put(ns, null, val, opt);
+			tair.put(ns, null, val, opt);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.KEY_NOT_AVAILABLE, e.getMessage());
@@ -101,41 +90,31 @@ public class Put extends TestBase {
 		
 		try {
 			byte[] key = UUID.randomUUID().toString().getBytes();
-			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.put(ns, key, null, opt);
+			tair.put(ns, key, null, opt);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.VALUE_NOT_AVAILABLE, e.getMessage());
 		}
 		
 		try {
-			byte[] key = UUID.randomUUID().toString().getBytes();
-			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.put(ns, null, null, null);
+			tair.put(ns, null, null, null);
 			
 		} catch (TairRpcError e) {
 		 
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.KEY_NOT_AVAILABLE, e.getMessage());
@@ -144,19 +123,15 @@ public class Put extends TestBase {
 		try {
 			byte[] key = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.put((short)-1, key, val, opt);
+			tair.put((short)-1, key, val, opt);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.NS_NOT_AVAILABLE, e.getMessage());
@@ -165,19 +140,15 @@ public class Put extends TestBase {
 		try {
 			byte[] key = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.put((short)(TairConstant.NAMESPACE_MAX), key, val, null);
+			tair.put((short)(TairConstant.NAMESPACE_MAX), key, val, null);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.NS_NOT_AVAILABLE, e.getMessage());

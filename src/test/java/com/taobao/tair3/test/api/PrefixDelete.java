@@ -56,7 +56,6 @@ public class PrefixDelete extends TestBase {
 	public void simpleDeleteWithNotExist() {
 		byte[] pkey = UUID.randomUUID().toString().getBytes();
 		byte[] skey = UUID.randomUUID().toString().getBytes();
-		byte[] value = UUID.randomUUID().toString().getBytes();
 		try {
 			//Result<Void> r = tair.prefixPut(ns, pkey, skey, value, opt);
 			//assertEquals(ResultCode.OK, r.getCode());
@@ -129,7 +128,7 @@ public class PrefixDelete extends TestBase {
 			Result<Void> r = tair.put(ns, key, val, null);
 			assertEquals(ResultCode.OK, r.getCode());
 			
-			Result<Void> d = tair.invalidByProxy(ns, null, null);
+			tair.invalidByProxy(ns, null, null);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

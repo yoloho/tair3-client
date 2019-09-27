@@ -109,7 +109,7 @@ public class BatchLockAndUnlock extends TestBase {
 				assertEquals(ResultCode.OK, entry.getValue().getCode());
 			}
 			//batch lock
-			ResultMap<byte[], Result<Void>> bl = tair.batchLock(ns, null, null);
+			tair.batchLock(ns, null, null);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -137,10 +137,10 @@ public class BatchLockAndUnlock extends TestBase {
 				assertEquals(ResultCode.OK, entry.getValue().getCode());
 			}
 			//batch lock
-			ResultMap<byte[], Result<Void>> bl = tair.batchLock(ns, keys, null);
+			tair.batchLock(ns, keys, null);
 			
 			//batch lock
-			ResultMap<byte[], Result<Void>> bl1 = tair.batchUnlock(ns, null, null);
+			tair.batchUnlock(ns, null, null);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

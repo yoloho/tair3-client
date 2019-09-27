@@ -14,7 +14,6 @@ import com.taobao.tair3.client.error.TairException;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.impl.invalid.InvalidServer;
-import com.taobao.tair3.client.packets.AbstractPacket;
 import com.taobao.tair3.client.packets.AbstractRequestPacket;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 import com.taobao.tair3.client.rpc.future.TairResultFutureImpl;

@@ -1,5 +1,4 @@
 package com.taobao.tair3.client.impl;
-import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -12,15 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.ResultMap;
-import com.taobao.tair3.client.TairClient.TairOption;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.error.TairTimeout;
-import com.taobao.tair3.client.impl.cast.TairResultCastFactory;
-import com.taobao.tair3.client.packets.configserver.QueryInfoRequest;
-import com.taobao.tair3.client.packets.configserver.QueryInfoResponse;
 import com.taobao.tair3.client.util.TairConstant;
-import com.taobao.tair3.client.util.TairUtil;
 
 public class DefaultTairClient extends AbstractTairClient {
 	protected static final Logger log = LoggerFactory.getLogger(DefaultTairClient.class);

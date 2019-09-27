@@ -10,7 +10,6 @@ import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.error.TairTimeout;
-import com.taobao.tair3.client.util.ByteArray;
 public class PrefixHideAndGetHidden extends TestBase {
 	@Test
 	public void simpleHide() {
@@ -59,7 +58,6 @@ public class PrefixHideAndGetHidden extends TestBase {
 		byte[] skey = UUID.randomUUID().toString().getBytes();
 		try {
 			int initValue = 0;
-			int value = 1;
 			Result<Void> rd = tair.prefixInvalidByProxy(ns, pkey, skey, null);
 			assertEquals(true , rd.getCode().equals(ResultCode.OK) || rd.getCode().equals(ResultCode.NOTEXISTS));
 			

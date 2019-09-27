@@ -2,12 +2,8 @@ package com.taobao.tair3.test.api;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -33,7 +29,7 @@ public class BoundedIncrDecr  extends TestBase {
 			tair.invalidByProxy(ns, key.getBytes(), null);
 			Result<Integer> i = tair.incr(ns, key.getBytes(), 0, 0, lowBound, upperBound, null);
 			assertEquals(ResultCode.OK, i.getCode());
-			assertEquals(0, i.getResult());
+			assertEquals(0, i.getResult().intValue());
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
 			e.printStackTrace();
@@ -56,7 +52,7 @@ public class BoundedIncrDecr  extends TestBase {
 				//ok
 				if (k < upperBound) {
 					assertEquals(ResultCode.OK, rr.getCode());
-					assertEquals(k + 1, rr.getResult());
+					assertEquals(k + 1, rr.getResult().intValue());
 				}
 				//out of range
 				else {
@@ -89,7 +85,7 @@ public class BoundedIncrDecr  extends TestBase {
 					tair.invalidByProxy(ns, key.getBytes(), null);
 					Result<Integer> i = tair.decr(ns, key.getBytes(), 0, 0, lowBound, upperBound, null);
 					assertEquals(ResultCode.OK, i.getCode());
-					assertEquals(0, i.getResult());
+					assertEquals(0, i.getResult().intValue());
 				} catch (TairRpcError e) {
 					assertEquals(false, true);
 					e.printStackTrace();
@@ -113,7 +109,7 @@ public class BoundedIncrDecr  extends TestBase {
 						//ok
 						if (k < upperBound) {
 							assertEquals(ResultCode.OK, rr.getCode());
-							assertEquals(k - 1, rr.getResult());
+							assertEquals(k - 1, rr.getResult().intValue());
 						}
 						//out of range
 						else {
@@ -147,7 +143,7 @@ public class BoundedIncrDecr  extends TestBase {
 			tair.invalidByProxy(ns, key.getBytes(), null);
 			Result<Integer> rc = tair.decr(ns, key.getBytes(), 0, 0, lowBound, upperBound, null);
 			assertEquals(ResultCode.OK, rc.getCode());
-			assertEquals(0, rc.getResult());
+			assertEquals(0, rc.getResult().intValue());
 			
 			Result<Integer> rc1 = tair.decr(ns, key.getBytes(), 1, 0, lowBound, upperBound, null);
 			assertEquals(ResultCode.COUNTER_OUT_OF_RANGE, rc1.getCode());
@@ -173,7 +169,8 @@ public class BoundedIncrDecr  extends TestBase {
 		int upperBound = -10;
 		try {
 			tair.invalidByProxy(ns, key.getBytes(), null);
-			Result<Integer> rc = tair.decr(ns, key.getBytes(), 0, 0, lowBound, upperBound, null);
+			//Result<Integer> rc = 
+	        tair.decr(ns, key.getBytes(), 0, 0, lowBound, upperBound, null);
 			//assertEquals(ResultCode.INVALID_ARGUMENT, rc.getCode());
 			
 			//Result<Integer> rc1 = tair.incr(namespace, key, 0, 0, 0, lowBound, upperBound);
@@ -218,7 +215,7 @@ public class BoundedIncrDecr  extends TestBase {
 				Result<Integer> rr = tair.decr(ns, key.getBytes(), 1, 0, lowBound, upperBound, null);
 				if (i < upperBound) {
 					assertEquals(ResultCode.OK, rr.getCode());
-					assertEquals(i - 1, rr.getResult());
+					assertEquals(i - 1, rr.getResult().intValue());
 				}
 				//out of range
 				else {
@@ -226,16 +223,12 @@ public class BoundedIncrDecr  extends TestBase {
 				}
 			}
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -260,7 +253,7 @@ public class BoundedIncrDecr  extends TestBase {
 				Result<Integer> rr = tair.incr(ns, key.getBytes(), 1, 0, lowBound, upperBound, null);
 				if (i < upperBound) {
 					assertEquals(ResultCode.OK, rr.getCode());
-					assertEquals(i + 1, rr.getResult());
+					assertEquals(i + 1, rr.getResult().intValue());
 				}
 				//out of range
 				else {
@@ -268,16 +261,12 @@ public class BoundedIncrDecr  extends TestBase {
 				}
 			}
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -1,13 +1,9 @@
 package com.taobao.tair3.test.api;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.taobao.tair3.client.Result;
@@ -67,7 +63,6 @@ public class Delete extends TestBase {
 	@Test
 	public void simpleDeleteWithNotExist() {
 		byte[] key = UUID.randomUUID().toString().getBytes();
-		byte[] val = UUID.randomUUID().toString().getBytes();
 		try {
 			//Result<Void> r = tair.put(ns, key, val, null);
 			//assertEquals(ResultCode.OK, r.getCode());
@@ -132,19 +127,15 @@ public class Delete extends TestBase {
 			Result<Void> r = tair.put(ns, key, val, null);
 			assertEquals(ResultCode.OK, r.getCode());
 			
-			Result<Void> d = tair.invalidByProxy(ns, null, null);
+			tair.invalidByProxy(ns, null, null);
 			
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			assertEquals(TairConstant.KEY_NOT_AVAILABLE, e.getMessage());

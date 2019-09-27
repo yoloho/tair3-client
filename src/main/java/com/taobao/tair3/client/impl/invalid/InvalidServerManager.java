@@ -57,13 +57,13 @@ public class InvalidServerManager {
 	}
 
 	public InvalidServer findInvalidServer() {
-		for (int i = 0; i < servers.length; ++i) {
+		//for (int i = 0; i < servers.length; ++i) {
 			int seq = Math.abs(lastSeq.incrementAndGet()) % servers.length;
 			InvalidServer server = servers[seq];
 //			if (aliveNodes.contains(server.getAddress())) {
 				return server;
 //			}
-		}
-		return null;
+		//}
+		//return null;
 	}
 }

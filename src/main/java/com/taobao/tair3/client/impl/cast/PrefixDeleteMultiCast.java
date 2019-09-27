@@ -9,7 +9,6 @@ import com.taobao.tair3.client.error.TairCastIllegalContext;
 import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.impl.TairProcessor.TairResultCast;
 import com.taobao.tair3.client.packets.common.BatchReturnResponse;
-import com.taobao.tair3.client.util.ByteArray;
 import com.taobao.tair3.client.util.TairUtil;
 import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.ResultMap;
@@ -23,7 +22,8 @@ public class PrefixDeleteMultiCast implements TairResultCast<BatchReturnResponse
 			throw new  TairCastIllegalContext("context of PrefixDeleteMultiCast.");
 		}
 
-		Pair<byte[], List<byte[]>> pair = (Pair<byte[], List<byte[]>>) context;
+		@SuppressWarnings("unchecked")
+        Pair<byte[], List<byte[]>> pair = (Pair<byte[], List<byte[]>>) context;
 		byte[] pkey = pair.first();
 		List<byte[]> keys = pair.second();
 		

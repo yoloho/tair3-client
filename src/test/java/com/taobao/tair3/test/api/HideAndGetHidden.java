@@ -57,10 +57,8 @@ public class HideAndGetHidden extends TestBase {
 	@Test
 	public void simpleHideCounter() {
 		byte[] key = UUID.randomUUID().toString().getBytes();
-		byte[] val = UUID.randomUUID().toString().getBytes();
 		try {
 			int initValue = 0;
-			int value = 1;
 			Result<Void> rd = tair.invalidByProxy(ns, key, null);
 			assertEquals(true , rd.getCode().equals(ResultCode.OK) || rd.getCode().equals(ResultCode.NOTEXISTS));
 			

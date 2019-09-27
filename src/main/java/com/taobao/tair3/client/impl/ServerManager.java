@@ -32,7 +32,6 @@ import com.taobao.tair3.client.packets.configserver.GetGroupResponse;
 import com.taobao.tair3.client.rpc.future.TairResultFutureImpl;
 import com.taobao.tair3.client.rpc.net.TairRpcContext;
 import com.taobao.tair3.client.rpc.protocol.tair2_3.PacketFactory;
-import com.taobao.tair3.client.rpc.protocol.tair2_3.PacketManager;
 import com.taobao.tair3.client.util.TairUtil;
 
 public class ServerManager {

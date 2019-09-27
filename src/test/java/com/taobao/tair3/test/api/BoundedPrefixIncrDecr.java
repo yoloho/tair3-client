@@ -25,7 +25,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 		try {
 			Result<Integer> ic = tair.prefixIncr(ns, pkey, skey, value, defaultValue, lowBound, upperBound, null);
 			assertEquals(ResultCode.OK, ic.getCode());
-			assertEquals(value + defaultValue, ic.getResult());
+			assertEquals(value + defaultValue, ic.getResult().intValue());
 			
 			
 			//2.incr upperBound times
@@ -34,7 +34,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 				//ok
 				if (i < upperBound) {
 					assertEquals(ResultCode.OK, rr.getCode());
-					assertEquals(i + 1, rr.getResult());
+					assertEquals(i + 1, rr.getResult().intValue());
 				}
 				//out of range
 				else {
@@ -64,7 +64,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 				try {
 					Result<Integer> ic = tair.prefixDecr(ns, pkey, skey, value, defaultValue, lowBound, upperBound, null);
 					assertEquals(ResultCode.OK, ic.getCode());
-					assertEquals(- value + defaultValue, ic.getResult());
+					assertEquals(- value + defaultValue, ic.getResult().intValue());
 					
 					
 					//2.incr upperBound times
@@ -73,7 +73,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 						//ok
 						if (i < upperBound) {
 							assertEquals(ResultCode.OK, rr.getCode());
-							assertEquals(-i - 1, rr.getResult());
+							assertEquals(-i - 1, rr.getResult().intValue());
 						}
 						//out of range
 						else {
@@ -136,7 +136,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 		int upperBound = -10;
 		removeKey(pkey, skey);
 		try {
-			Result<Integer> ic = tair.prefixIncr(ns,pkey, skey, value, defaultValue, lowBound, upperBound, null);
+			tair.prefixIncr(ns,pkey, skey, value, defaultValue, lowBound, upperBound, null);
 			assertEquals(true, false);
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -150,7 +150,7 @@ public class BoundedPrefixIncrDecr  extends TestBase {
 			assertEquals(TairConstant.KEY_NOT_AVAILABLE, e.getMessage());
 		}
 		try {
-			Result<Integer> ic = tair.prefixDecr(ns,pkey, skey, value, defaultValue, lowBound, upperBound, null);
+			tair.prefixDecr(ns,pkey, skey, value, defaultValue, lowBound, upperBound, null);
 			assertEquals(true, false);
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

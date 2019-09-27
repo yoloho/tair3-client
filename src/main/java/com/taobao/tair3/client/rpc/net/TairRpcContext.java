@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 //import com.taobao.eagleeye.EagleEye;
 //import com.taobao.eagleeye.RpcContext_inner;
 import com.taobao.tair3.client.Result;
-import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.error.TairException;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
@@ -27,8 +26,6 @@ import com.taobao.tair3.client.packets.AbstractRequestPacket;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 import com.taobao.tair3.client.packets.dataserver.TrafficCheckResponse;
 import com.taobao.tair3.client.rpc.future.TairResultFutureImpl;
-import com.taobao.tair3.client.rpc.protocol.tair2_3.PacketHeader;
-import com.taobao.tair3.client.rpc.protocol.tair2_3.PacketManager;
 
 
 public class TairRpcContext {
@@ -308,7 +305,7 @@ public class TairRpcContext {
 			if (packet.getBody() instanceof TrafficCheckResponse) {
 				TrafficCheckResponse tcr = (TrafficCheckResponse) packet.getBody();
 				tairChannel.limitLevelTouch(tcr.getNamespace(), tcr.getStatus());
-                int threshold = tairChannel.getCurrentThreshold(tcr.getNamespace());
+                tairChannel.getCurrentThreshold(tcr.getNamespace());
                 /*
                 // [EagleEye]
                 EagleEye.startRpc(String.valueOf(PacketManager.getPacketCode(tcr.getClass())), serverManager.getRowGroupName());

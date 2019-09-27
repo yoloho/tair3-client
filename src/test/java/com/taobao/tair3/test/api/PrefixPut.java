@@ -54,10 +54,9 @@ public class PrefixPut extends TestBase {
 	public void simplePutWithIllegalParameter() {
 		
 		try {
-			byte[] pkey = UUID.randomUUID().toString().getBytes();
 			byte[] skey = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.prefixPut(ns, null, skey, val, opt);
+			tair.prefixPut(ns, null, skey, val, opt);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -77,9 +76,8 @@ public class PrefixPut extends TestBase {
 		
 		try {
 			byte[] pkey = UUID.randomUUID().toString().getBytes();
-			byte[] skey = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.prefixPut(ns, pkey, null, val, opt);
+			tair.prefixPut(ns, pkey, null, val, opt);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -98,9 +96,8 @@ public class PrefixPut extends TestBase {
 		}
 		
 		try {
-			byte[] key = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.prefixPut(ns, null, null, val, opt);
+	        tair.prefixPut(ns, null, null, val, opt);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -121,8 +118,7 @@ public class PrefixPut extends TestBase {
 		try {
 			byte[] pkey = UUID.randomUUID().toString().getBytes();
 			byte[] skey = UUID.randomUUID().toString().getBytes();
-			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.prefixPut(ns, pkey, skey, null, opt);
+			tair.prefixPut(ns, pkey, skey, null, opt);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);
@@ -144,7 +140,7 @@ public class PrefixPut extends TestBase {
 			byte[] pkey = UUID.randomUUID().toString().getBytes();
 			byte[] skey = UUID.randomUUID().toString().getBytes();
 			byte[] val = UUID.randomUUID().toString().getBytes();
-			Result<Void> r = tair.prefixPut((short)-1, pkey, skey, val, opt);
+			tair.prefixPut((short)-1, pkey, skey, val, opt);
 			
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

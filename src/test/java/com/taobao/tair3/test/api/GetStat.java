@@ -2,7 +2,6 @@ package com.taobao.tair3.test.api;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +25,12 @@ public class GetStat extends TestBase {
 			Result<Map<String, String>> rkv = tair.getStat(5, "group_1", 0, opt);
 			 rkv.getResult();
 		} catch (TairRpcError e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairFlowLimit e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TairTimeout e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

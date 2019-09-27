@@ -61,7 +61,7 @@ public class PrefxiPutObjectAndCounterMulti extends TestBase {
 			assertEquals(ResultCode.OK, im.getCode());
 			for (Map.Entry<byte[], Result<Integer>> e : im.getResult().entrySet()) {
 				assertEquals(ResultCode.OK, e.getValue().getCode());
-				assertEquals(value, e.getValue().getResult());
+				assertEquals(value, e.getValue().getResult().intValue());
 			}
 		} catch (TairRpcError e) {
 			assertEquals(false, true);

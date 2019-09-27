@@ -1,7 +1,5 @@
 package com.taobao.tair3.client.error;
 
-import java.net.SocketAddress;
-
 public class TairException extends Exception {
 	/**
 	 * 

@@ -3,7 +3,6 @@ package com.taobao.tair3.client.packets.configserver;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.taobao.tair3.client.packets.AbstractRequestPacket;
-import com.taobao.tair3.client.packets.dataserver.HideRequest;
 import com.taobao.tair3.client.util.TairConstant;
 
 public class QueryInfoRequest extends AbstractRequestPacket {
