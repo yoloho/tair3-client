@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InvalidServer {
-	protected static final Logger log = LoggerFactory.getLogger(InvalidServer.class);
+    protected static final Logger log = LoggerFactory.getLogger(InvalidServer.class);
     private int maxFailCount = 30;
     private SocketAddress address = null;
     private AtomicInteger failcount = new AtomicInteger(0);
@@ -24,7 +24,7 @@ public class InvalidServer {
     }
 
     public int incFailCount() {
-    	return failcount.incrementAndGet();
+        return failcount.incrementAndGet();
     }
     public void resetFailCount() {
         failcount.set(0);

@@ -8,9 +8,9 @@ import com.taobao.tair3.client.Result.ResultCode;
 
 public class PutCast implements TairResultCast<ReturnResponse, Result<Void>> {
 
-	public Result<Void> cast(ReturnResponse s, Object context) throws TairRpcError {
-		Result<Void> result = new Result<Void>();
-		result.setCode(ResultCode.castResultCode(s.getCode()));
-		return result;
-	}
+    public Result<Void> cast(ReturnResponse s, Object context) throws TairRpcError {
+        Result<Void> result = new Result<Void>();
+        result.setCode(ResultCode.castResultCode(s.getCode()));
+        return result;
+    }
 }

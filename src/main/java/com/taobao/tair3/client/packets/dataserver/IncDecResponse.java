@@ -8,21 +8,21 @@ public class IncDecResponse  extends AbstractResponsePacket {
     protected int value = 0;
     
     public int getValue() {
-    	return value;
+        return value;
     }
     
     @Override
     public void decodeFrom(ChannelBuffer buffer) {
-    	value = buffer.readInt();
-    	resultCode = 0;
-    	return;
+        value = buffer.readInt();
+        resultCode = 0;
+        return;
     }
   
     public boolean hasConfigVersion() {
-    	return true;
+        return true;
     }
     @Override
     public int decodeResultCodeFrom(ChannelBuffer buf) {
-    	return 0;
+        return 0;
     }
 }

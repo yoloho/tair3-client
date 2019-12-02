@@ -17,11 +17,11 @@ import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 
 public class GetResponse extends AbstractResponsePacket {
-	
+    
     protected List<Result<byte[]>> datas = null;
     protected List<Result<byte[]>> proxyDatas = null;
     public List<Result<byte[]>> getEntrires() {
-    	return datas;
+        return datas;
     }
     
     @Override
@@ -32,45 +32,45 @@ public class GetResponse extends AbstractResponsePacket {
 
         //entries = new ArrayList<DataEntry>(count);
         datas = new ArrayList<Result<byte[]>>(count);
-		for (int i = 0; i < count; i++) {
-			Result<byte[]> r = new Result<byte[]>();
-			
-			decodeMeta(buff, r);
-			int msize = buff.readInt();
-			size = (msize & 0x3FFFFF);
-			short prefixSize = (short)(msize >> 22);
+        for (int i = 0; i < count; i++) {
+            Result<byte[]> r = new Result<byte[]>();
+            
+            decodeMeta(buff, r);
+            int msize = buff.readInt();
+            size = (msize & 0x3FFFFF);
+            short prefixSize = (short)(msize >> 22);
 
-			//with prefix key
-			if (prefixSize != 0) {
-				size -= PREFIX_KEY_TYPE.length;
-				prefixSize -= PREFIX_KEY_TYPE.length;
-				//two bytes flag
-				//buff.readShort();
-				buff.skipBytes(PREFIX_KEY_TYPE.length);
-			}
-			byte[] keyBytes = new byte[size];
-			buff.readBytes(keyBytes);
-			r.setKey(keyBytes, prefixSize);
-		 
-			decodeMeta(buff);
-			int valLength = buff.readInt();
-			byte[] valBytes = new byte[valLength];
-			buff.readBytes(valBytes);
-			if (r.isCounter()) {
-				byte[] rowCount = new byte[4];
-				System.arraycopy(valBytes, 2, rowCount, 0, 4);
-				r.setResult(rowCount);
-			}
-			else {
-				r.setResult(valBytes);
-			}
-			datas.add(r);
-		}
+            //with prefix key
+            if (prefixSize != 0) {
+                size -= PREFIX_KEY_TYPE.length;
+                prefixSize -= PREFIX_KEY_TYPE.length;
+                //two bytes flag
+                //buff.readShort();
+                buff.skipBytes(PREFIX_KEY_TYPE.length);
+            }
+            byte[] keyBytes = new byte[size];
+            buff.readBytes(keyBytes);
+            r.setKey(keyBytes, prefixSize);
+         
+            decodeMeta(buff);
+            int valLength = buff.readInt();
+            byte[] valBytes = new byte[valLength];
+            buff.readBytes(valBytes);
+            if (r.isCounter()) {
+                byte[] rowCount = new byte[4];
+                System.arraycopy(valBytes, 2, rowCount, 0, 4);
+                r.setResult(rowCount);
+            }
+            else {
+                r.setResult(valBytes);
+            }
+            datas.add(r);
+        }
         return ;
     }    
     
     
     public boolean hasConfigVersion() {
-    	return true;
+        return true;
     }
 }

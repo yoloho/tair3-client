@@ -14,13 +14,13 @@ import com.taobao.tair3.client.packets.AbstractResponsePacket;
 
 
 public class ReturnResponse extends AbstractResponsePacket {
-	
+    
     //private int    code = 0;
     private String msg  = null;
 
 
     public boolean hasConfigVersion() {
-    	return true;
+        return true;
     }
     @Override
     public void decodeFrom(ChannelBuffer buffer) {
@@ -45,7 +45,7 @@ public class ReturnResponse extends AbstractResponsePacket {
         return msg;
     }
     
-	public int decodeConfigVersionFrom(ChannelBuffer bb) {
-		return bb.readInt();
-	}
+    public int decodeConfigVersionFrom(ChannelBuffer bb) {
+        return bb.readInt();
+    }
 }

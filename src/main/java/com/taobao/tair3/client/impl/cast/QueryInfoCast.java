@@ -10,13 +10,13 @@ import com.taobao.tair3.client.impl.TairProcessor.TairResultCast;
 import com.taobao.tair3.client.packets.configserver.QueryInfoResponse;
 public class QueryInfoCast implements TairResultCast<QueryInfoResponse,Result<Map<String, String>>> {
 
-	public Result<Map<String, String>> cast(QueryInfoResponse s, Object context)
-			throws TairRpcError, TairCastIllegalContext {
-		Result<Map<String, String>> result = new Result<Map<String, String>>();
-		result.setCode(ResultCode.OK);
-		result.setResult(s.getInfoMap());
-		return result;
-	}
+    public Result<Map<String, String>> cast(QueryInfoResponse s, Object context)
+            throws TairRpcError, TairCastIllegalContext {
+        Result<Map<String, String>> result = new Result<Map<String, String>>();
+        result.setCode(ResultCode.OK);
+        result.setResult(s.getInfoMap());
+        return result;
+    }
 
 
 }

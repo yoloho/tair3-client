@@ -10,27 +10,27 @@ import com.taobao.tair3.client.rpc.net.TairRpcPacketFactory;
 
 public class MessageFactory implements TairRpcPacketFactory {
 
-	private static MessageFactory instance = new MessageFactory();
-	
-	private MessageManager manager = null; 
+    private static MessageFactory instance = new MessageFactory();
+    
+    private MessageManager manager = null; 
 
-	private MessageFactory() {
-		try {
-			manager = new MessageManager();
-		} catch (Exception e) {
-			throw new RuntimeException(new TairException(e));
-		} 
-	}
+    private MessageFactory() {
+        try {
+            manager = new MessageManager();
+        } catch (Exception e) {
+            throw new RuntimeException(new TairException(e));
+        } 
+    }
 
-	public static TairRpcPacketFactory getInstance() {
-		return instance;
-	}
+    public static TairRpcPacketFactory getInstance() {
+        return instance;
+    }
 
-	public TairRpcPacket buildWithHeader(ChannelBuffer in) throws TairRpcError {
-		return MessageWrapper.buildWithHeader(in, manager);
-	}
+    public TairRpcPacket buildWithHeader(ChannelBuffer in) throws TairRpcError {
+        return MessageWrapper.buildWithHeader(in, manager);
+    }
 
-	public TairRpcPacket buildWithBody(int chid, Object body) {
-		return MessageWrapper.buildWithBody(chid, (Message) body, manager);
-	}
+    public TairRpcPacket buildWithBody(int chid, Object body) {
+        return MessageWrapper.buildWithBody(chid, (Message) body, manager);
+    }
 }

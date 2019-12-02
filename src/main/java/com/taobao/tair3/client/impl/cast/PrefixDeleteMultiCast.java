@@ -17,41 +17,41 @@ import com.taobao.tair3.client.TairClient.Pair;
 
 
 public class PrefixDeleteMultiCast implements TairResultCast<BatchReturnResponse, Result<ResultMap<byte[], Result<Void>>>> {
-	public Result<ResultMap<byte[], Result<Void>>> cast(BatchReturnResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
-		if (context == null || !(context instanceof Pair<?, ?>)) {
-			throw new  TairCastIllegalContext("context of PrefixDeleteMultiCast.");
-		}
+    public Result<ResultMap<byte[], Result<Void>>> cast(BatchReturnResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
+        if (context == null || !(context instanceof Pair<?, ?>)) {
+            throw new  TairCastIllegalContext("context of PrefixDeleteMultiCast.");
+        }
 
-		@SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked")
         Pair<byte[], List<byte[]>> pair = (Pair<byte[], List<byte[]>>) context;
-		byte[] pkey = pair.first();
-		List<byte[]> keys = pair.second();
-		
-		Result<ResultMap<byte[], Result<Void>>> result = new Result<ResultMap<byte[], Result<Void>>> ();
-		ResultMap<byte[], Result<Void>> resMap = new ResultMap<byte[], Result<Void>> ();
-		Set<byte[]> keySet = new TreeSet<byte[]> (TairUtil.BYTES_COMPARATOR);
-		keySet.addAll(keys);
-		ResultCode code = ResultCode.castResultCode(s.getCode());
-		Map<byte[], Integer>  kcmap = s.getKeyCodeMap();
-		if (kcmap != null) {
-			for (Map.Entry<byte[], Integer> e : kcmap.entrySet()) {
-				keySet.remove(e.getKey());
-				Result<Void> r = new Result<Void>();
-				r.setCode(ResultCode.castResultCode(e.getValue()));
-				resMap.put(e.getKey(), r);
-			}
-		}
-		for (byte[] key : keySet) {
-			Result<Void> r = new Result<Void>();
-			r.setCode(ResultCode.OK);
-			resMap.put(key, r);
-		}
-		 
-		result.setCode(code);
-		resMap.setCode(code);
-		resMap.setKey(pkey);
-		result.setResult(resMap);
-		return result;
-	}
+        byte[] pkey = pair.first();
+        List<byte[]> keys = pair.second();
+        
+        Result<ResultMap<byte[], Result<Void>>> result = new Result<ResultMap<byte[], Result<Void>>> ();
+        ResultMap<byte[], Result<Void>> resMap = new ResultMap<byte[], Result<Void>> ();
+        Set<byte[]> keySet = new TreeSet<byte[]> (TairUtil.BYTES_COMPARATOR);
+        keySet.addAll(keys);
+        ResultCode code = ResultCode.castResultCode(s.getCode());
+        Map<byte[], Integer>  kcmap = s.getKeyCodeMap();
+        if (kcmap != null) {
+            for (Map.Entry<byte[], Integer> e : kcmap.entrySet()) {
+                keySet.remove(e.getKey());
+                Result<Void> r = new Result<Void>();
+                r.setCode(ResultCode.castResultCode(e.getValue()));
+                resMap.put(e.getKey(), r);
+            }
+        }
+        for (byte[] key : keySet) {
+            Result<Void> r = new Result<Void>();
+            r.setCode(ResultCode.OK);
+            resMap.put(key, r);
+        }
+         
+        result.setCode(code);
+        resMap.setCode(code);
+        resMap.setKey(pkey);
+        result.setResult(resMap);
+        return result;
+    }
 
 }

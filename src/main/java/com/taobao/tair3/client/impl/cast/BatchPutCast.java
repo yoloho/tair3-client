@@ -9,9 +9,9 @@ import com.taobao.tair3.client.ResultMap;
 
 public class BatchPutCast implements TairResultCast<BatchPutResponse, Result<ResultMap<byte[], Result<Void>>>> {
 
-	public Result<ResultMap<byte[], Result<Void>>> cast(BatchPutResponse s,
-			Object context) throws TairRpcError, TairCastIllegalContext {
-		return null;
-	}
-	
+    public Result<ResultMap<byte[], Result<Void>>> cast(BatchPutResponse s,
+            Object context) throws TairRpcError, TairCastIllegalContext {
+        return null;
+    }
+    
 }

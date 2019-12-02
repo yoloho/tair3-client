@@ -13,14 +13,14 @@ public class DeamondThreadFactory implements ThreadFactory {
     final String namePrefix;
     
     static {
-    	ThreadRenamingRunnable.setThreadNameDeterminer(new ThreadNameDeterminer() {
+        ThreadRenamingRunnable.setThreadNameDeterminer(new ThreadNameDeterminer() {
 
-			public String determineThreadName(String currentThreadName,
-					String proposedThreadName) throws Exception {
-				return currentThreadName;
-			}
-			
-		});
+            public String determineThreadName(String currentThreadName,
+                    String proposedThreadName) throws Exception {
+                return currentThreadName;
+            }
+            
+        });
     }
 
     public DeamondThreadFactory(String prefix) {

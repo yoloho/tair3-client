@@ -13,30 +13,30 @@ import org.jboss.netty.channel.Channels;
 public final class TairConnector {
 
     private ClientBootstrap bootstrap = null;
-	private static final long DEFAULT_CONNECT_TIMEOUT = 500L;
-	
-	public TairConnector(final TairRpcContext context, ChannelFactory factory) {
-		bootstrap = new ClientBootstrap(factory);
-		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
-		bootstrap.setOption("tcpNoDelay", true);
-		bootstrap.setOption("keepAlive", true);
-		bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-			public ChannelPipeline getPipeline() throws Exception {
-				return Channels.pipeline(new TairDecoder(), new TairHandler(context));
-			}
-		});
-	}
-	
+    private static final long DEFAULT_CONNECT_TIMEOUT = 500L;
+    
+    public TairConnector(final TairRpcContext context, ChannelFactory factory) {
+        bootstrap = new ClientBootstrap(factory);
+        setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
+        bootstrap.setOption("tcpNoDelay", true);
+        bootstrap.setOption("keepAlive", true);
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            public ChannelPipeline getPipeline() throws Exception {
+                return Channels.pipeline(new TairDecoder(), new TairHandler(context));
+            }
+        });
+    }
+    
 
-	public void setConnectTimeout(long timeout) {
-		bootstrap.setOption("connectTimeoutMillis", timeout);
-	}
-	
-	public ChannelFuture createSession(SocketAddress addr, ChannelFutureListener listener) {
-		ChannelFuture future = bootstrap.connect(addr);
-		future.addListener(listener);
-		return future;
-	}
-	
-	
+    public void setConnectTimeout(long timeout) {
+        bootstrap.setOption("connectTimeoutMillis", timeout);
+    }
+    
+    public ChannelFuture createSession(SocketAddress addr, ChannelFutureListener listener) {
+        ChannelFuture future = bootstrap.connect(addr);
+        future.addListener(listener);
+        return future;
+    }
+    
+    
 }

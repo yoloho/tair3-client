@@ -6,30 +6,30 @@ import com.taobao.tair3.client.packets.AbstractRequestPacket;
 
 
 public class GetGroupRequest extends AbstractRequestPacket {
-	
+    
     private byte[] group;
     private int    cfgVer;
     
     public GetGroupRequest(String groupName, int version) {
-    	this.group = groupName.getBytes();
-    	this.cfgVer = version;
+        this.group = groupName.getBytes();
+        this.cfgVer = version;
     }
     
     @Override
     public void encodeTo(ChannelBuffer out) {
-		out.writeInt(cfgVer);
-		out.writeInt(group.length);
-		out.writeBytes(group);
-	}
+        out.writeInt(cfgVer);
+        out.writeInt(group.length);
+        out.writeBytes(group);
+    }
     
-	public int size() {
-		return 4 + 4 + group.length;
-	}
+    public int size() {
+        return 4 + 4 + group.length;
+    }
 
-	@Override
-	public short getNamespace() {
-		return 0;
-	}
+    @Override
+    public short getNamespace() {
+        return 0;
+    }
 
  
 }

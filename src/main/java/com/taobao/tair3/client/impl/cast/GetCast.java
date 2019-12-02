@@ -8,20 +8,20 @@ import com.taobao.tair3.client.Result.ResultCode;
 
 public class GetCast implements TairResultCast<GetResponse,Result<byte[]>> {
 
-	public Result<byte[]> cast(GetResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
-		if (context == null || !(context instanceof Short)) {
-			throw new  TairCastIllegalContext("context of GetCast.");
-		}
-		Result<byte[]> result = null;
-		ResultCode code = ResultCode.castResultCode(s.getCode());
-		
-		if (code.equals(ResultCode.OK) && s.getEntrires().size() > 0) {
-			result = s.getEntrires().get(0);
-		}
-		else {
-			result = new Result<byte[]> ();
-		}
-		result.setCode(code);
-		return result;
-	}
+    public Result<byte[]> cast(GetResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
+        if (context == null || !(context instanceof Short)) {
+            throw new  TairCastIllegalContext("context of GetCast.");
+        }
+        Result<byte[]> result = null;
+        ResultCode code = ResultCode.castResultCode(s.getCode());
+        
+        if (code.equals(ResultCode.OK) && s.getEntrires().size() > 0) {
+            result = s.getEntrires().get(0);
+        }
+        else {
+            result = new Result<byte[]> ();
+        }
+        result.setCode(code);
+        return result;
+    }
 }

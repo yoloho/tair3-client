@@ -9,25 +9,25 @@ import com.taobao.tair3.client.impl.TairProcessor.TairResultCast;
 import com.taobao.tair3.client.packets.dataserver.SimplePrefixGetMultiResponse;
 
 public class SimplePrefixGetMultiCast
-		implements
-		TairResultCast<SimplePrefixGetMultiResponse, Result<ResultMap<byte[], Result<byte[]>>>> {
+        implements
+        TairResultCast<SimplePrefixGetMultiResponse, Result<ResultMap<byte[], Result<byte[]>>>> {
 
-	public Result<ResultMap<byte[], Result<byte[]>>> cast(
-			SimplePrefixGetMultiResponse s, Object context)
-			throws TairRpcError, TairCastIllegalContext {
-		List<Result<byte[]>> res = s.getResult();
-		ResultMap<byte[], Result<byte[]>> rm = new ResultMap<byte[], Result<byte[]>>(); 
-		if (res != null) {
-			for (Result<byte[]> r : res) {
-				if (r.getKey() != null) {
-					rm.put(r.getKey(), r);
-				}
-			}
-		}
-		Result<ResultMap<byte[], Result<byte[]>>> result = new Result<ResultMap<byte[], Result<byte[]>>>();
-		result.setCode(ResultCode.castResultCode(s.getCode()));
-		rm.setCode(ResultCode.castResultCode(s.getCode()));
-		result.setResult(rm);
-		return result;
-	}
+    public Result<ResultMap<byte[], Result<byte[]>>> cast(
+            SimplePrefixGetMultiResponse s, Object context)
+            throws TairRpcError, TairCastIllegalContext {
+        List<Result<byte[]>> res = s.getResult();
+        ResultMap<byte[], Result<byte[]>> rm = new ResultMap<byte[], Result<byte[]>>(); 
+        if (res != null) {
+            for (Result<byte[]> r : res) {
+                if (r.getKey() != null) {
+                    rm.put(r.getKey(), r);
+                }
+            }
+        }
+        Result<ResultMap<byte[], Result<byte[]>>> result = new Result<ResultMap<byte[], Result<byte[]>>>();
+        result.setCode(ResultCode.castResultCode(s.getCode()));
+        rm.setCode(ResultCode.castResultCode(s.getCode()));
+        result.setResult(rm);
+        return result;
+    }
 }
