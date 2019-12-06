@@ -28,7 +28,7 @@
     <name>Tair Java Client for Tair 3.x</name>
     <groupId>com.yoloho.tair</groupId>
     <artifactId>tair3-client</artifactId>
-    <version>3.0.1.13</version>
+    <version>3.1.0</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
