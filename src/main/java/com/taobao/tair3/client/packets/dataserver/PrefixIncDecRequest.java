@@ -22,7 +22,7 @@ public class PrefixIncDecRequest extends AbstractRequestPacket {
         return this.namespace;
     }
     public static PrefixIncDecRequest build(short ns, byte[] pkey, Map<byte[], Counter> skv) {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE) {
@@ -45,40 +45,35 @@ public class PrefixIncDecRequest extends AbstractRequestPacket {
     }
     @Override
     public void encodeTo(ChannelBuffer buffer) {
-        int keySize = 0;
-        
         buffer.writeByte(0);
         buffer.writeShort(namespace);
         
         encodeDataMeta(buffer);
-        buffer.writeInt(pkey.length + PREFIX_KEY_TYPE.length);
-        buffer.writeBytes(PREFIX_KEY_TYPE);
-        buffer.writeBytes(pkey);
+        encodeDataEntry(buffer, PREFIX_KEY_TYPE, pkey);
         
         buffer.writeInt(skvs.size());
         for (Map.Entry<byte[], Counter> e : skvs.entrySet()) {
             byte[] skey = e.getKey();
             Counter counter = e.getValue();
-            keySize = pkey.length + PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-            encodeDataMeta(buffer);
-            buffer.writeInt(keySize);
-            buffer.writeBytes(PREFIX_KEY_TYPE);
-            buffer.writeBytes(pkey);
-            buffer.writeBytes(skey);
+            encodeKeyOrValue(buffer, pkey, skey);
             
             counter.setExpire(TairUtil.getDuration(counter.getExpire()));
-            buffer.writeInt(counter.getValue());
-            buffer.writeInt(counter.getInitValue());
-            buffer.writeInt(counter.getExpire());
+            buffer.writeLong(counter.getValue());
+            buffer.writeLong(counter.getInitValue());
+            buffer.writeLong(counter.getExpire());
         }
     }
 
     public int size() {
-        int s = 1 + 2 + 4 + 40 + (pkey.length + 2) + 4;
+        int s = 1;
+        s += 2;
+        s += METADATA_SIZE + sizeOfDataEntry(PREFIX_KEY_TYPE, pkey);
+        s += 4; // key count
         for (Map.Entry<byte[], Counter> e : skvs.entrySet()) {
-            s += (40 + 4 + e.getKey().length + pkey.length + 12 + PREFIX_KEY_TYPE.length);
+            s += keyOrValueEncodedSize(pkey, e.getKey());
+            s += 8; // value
+            s += 8; // init value
+            s += 8; // expire
         }
         return s;
     }

@@ -26,29 +26,24 @@ public class PrefixDeleteMultiRequest extends AbstractRequestPacket {
     public void encodeTo(ChannelBuffer out) {
         out.writeByte((byte)0); // 1
         out.writeShort(namespace); // 2
-        out.writeInt(skeys.size()); // 4
+        out.writeInt(skeys.size()); // key count
         for (byte[] skey : skeys) {
-            int keySize = pkey.length + PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-            encodeDataMeta(out); // 36
-            out.writeInt(keySize); // 4
-            out.writeBytes(PREFIX_KEY_TYPE);
-            out.writeBytes(pkey);
-            out.writeBytes(skey);
+            encodeKeyOrValue(out, pkey, skey);
         }
     }
 
     public int size() {
-        int s = 7;
+        int s = 1;
+        s += 2;
+        s += 4; // key count
         for (byte[] skey : skeys) {
-            s += (4 + 36 + pkey.length + skey.length + PREFIX_KEY_TYPE.length);
+            s += keyOrValueEncodedSize(pkey, skey);
         }
         return s;
     }
 
     public static PrefixDeleteMultiRequest build(short ns, byte[] pkey, List<byte[]> skeys) {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE) {

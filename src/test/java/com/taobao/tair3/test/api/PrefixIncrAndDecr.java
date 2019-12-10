@@ -22,14 +22,14 @@ public class PrefixIncrAndDecr extends TestBase {
         int value2 = 5;
         int initValue = 1;
         try {
-            Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
+            Result<Long> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + initValue), i.getResult().intValue());
             assertEquals(0, i.getVersion());
             
             
              
-            Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, opt);
+            Result<Long> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, opt);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + initValue - value2), d.getResult().intValue());
             assertEquals(0, d.getVersion());
@@ -54,7 +54,7 @@ public class PrefixIncrAndDecr extends TestBase {
         int value2 = 5;
         int initValue = 1;
         try {
-            Result<Integer> i = tair.prefixIncr(ns, null, skey, value2, initValue, opt);
+            Result<Long> i = tair.prefixIncr(ns, null, skey, value2, initValue, opt);
             assertEquals(true, false);
             //assertEquals((value + initValue), i.getResult());
             assertEquals(0, i.getVersion());
@@ -91,7 +91,7 @@ public class PrefixIncrAndDecr extends TestBase {
         int initValue = 1;
         try {
             TairOption opt = new TairOption(500000, (short)0, 2);
-            Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
+            Result<Long> i = tair.prefixIncr(ns, pkey, skey, value, initValue, opt);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + initValue), i.getResult().intValue());
             assertEquals(0, i.getVersion());
@@ -101,7 +101,7 @@ public class PrefixIncrAndDecr extends TestBase {
             Result<byte[]>  g = tair.prefixGet(ns, pkey, skey, null);
             assertEquals(ResultCode.NOTEXISTS, g.getCode());
             
-            Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, opt);
+            Result<Long> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, opt);
             assertEquals(ResultCode.OK, d.getCode());
             assertEquals(0, d.getVersion());
         } catch (TairRpcError e) {
@@ -134,7 +134,7 @@ public class PrefixIncrAndDecr extends TestBase {
             assertEquals(ResultCode.OK, p.getCode());
             
              
-            Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value2, initValue, null);
+            Result<Long> i = tair.prefixIncr(ns, pkey, skey, value2, initValue, null);
             assertEquals(ResultCode.CANNOT_OVERRIDE, i.getCode());
             
              
@@ -142,7 +142,7 @@ public class PrefixIncrAndDecr extends TestBase {
             Result<byte[]>  g = tair.prefixGet(ns, pkey, skey, null);
             assertEquals(ResultCode.OK, g.getCode());
             
-            Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, null);
+            Result<Long> d = tair.prefixDecr(ns, pkey, skey, value2, initValue, null);
             assertEquals(ResultCode.CANNOT_OVERRIDE, d.getCode());
         } catch (TairRpcError e) {
             e.printStackTrace();
@@ -170,13 +170,13 @@ public class PrefixIncrAndDecr extends TestBase {
             Result<Void> s = tair.prefixSetCount(ns, pkey, skey, defaultValue, null);
             assertEquals(ResultCode.OK, s.getCode());
             
-            Result<Integer> i = tair.prefixIncr(ns, pkey, skey, value, 2, null);
+            Result<Long> i = tair.prefixIncr(ns, pkey, skey, value, 2, null);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue), i.getResult().intValue());
              
              
             
-            Result<Integer> d = tair.prefixDecr(ns, pkey, skey, value2, defaultValue, null);
+            Result<Long> d = tair.prefixDecr(ns, pkey, skey, value2, defaultValue, null);
             assertEquals(ResultCode.OK, d.getCode());
             assertEquals((value + defaultValue - value2), d.getResult().intValue());
          

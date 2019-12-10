@@ -13,70 +13,58 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import com.taobao.tair3.client.TairClient.TairOption;
 import com.taobao.tair3.client.packets.AbstractRequestPacket;
 import com.taobao.tair3.client.util.TairConstant;
+import com.taobao.tair3.client.util.TairConstant.MetaFlag;
 import com.taobao.tair3.client.util.TairUtil;
 
 public class PutRequest extends AbstractRequestPacket {
+    private static final MetaFlag[] EMPTY_FLAG = new MetaFlag[0];
     protected short namespace;
     protected short version;
-    protected int expired;
+    protected long expired;
     protected byte[] pkey;
     protected byte[] skey;
-    protected int keyFlag = 0;
+    protected MetaFlag[] keyFlag = EMPTY_FLAG;
     protected byte[] val;
-    protected int valueFlag = 0;
+    protected MetaFlag[] valueFlag = EMPTY_FLAG;
 
-    public PutRequest(short ns, byte[] pkey, byte[] skey, int keyFlag, byte[] val, int valueFlag,  short version, int expired) {
+    public PutRequest(short ns, byte[] pkey, byte[] skey, byte[] val,  short version, long expired) {
         this.namespace = ns;
         this.version = version;
         this.expired = expired;
         this.pkey = pkey;
         this.skey = skey;
-        this.keyFlag = keyFlag;
         this.val = val;
-        this.valueFlag = valueFlag;
     }
     @Override
     public void encodeTo(ChannelBuffer buffer) {
         buffer.writeByte((byte) 0); //1
         buffer.writeShort(namespace); //2
         buffer.writeShort(version); //2 
-        buffer.writeInt(TairUtil.getDuration(expired)); //4
-        //prefix
-        int keySize = pkey.length;
-        if (skey != null) {
-            keySize += PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-        }
+        buffer.writeLong(TairUtil.getDuration(expired)); //8
         //using static buffer
-        encodeDataMeta(buffer, keyFlag);
-        buffer.writeInt(keySize);
-        if (skey != null) {
-            //with prefix key
-            buffer.writeBytes(PREFIX_KEY_TYPE);
-        }
-        buffer.writeBytes(pkey);
-        if (skey != null) {
-            buffer.writeBytes(skey);
-        }
-
-        encodeDataMeta(buffer, valueFlag);
-        buffer.writeInt(val.length);
-        buffer.writeBytes(val);
+        encodeKeyOrValue(buffer, pkey, skey, keyFlag);
+        encodeKeyOrValue(buffer, val, valueFlag);
     }
     
     public int size() {
-        int size = 9 + 40 + pkey.length + 40 + val.length;
-        if (skey != null) {
-            size += skey.length;
-            size += PREFIX_KEY_TYPE.length;
-        }
+        int size = 1 + 2;
+        size += 2; // version
+        size += 8; // expire
+        size += keyOrValueEncodedSize(pkey, skey);
+        size += keyOrValueEncodedSize(val);
         return size;
     }
+    
+    public void setKeyFlag(MetaFlag[] keyFlag) {
+        this.keyFlag = keyFlag;
+    }
+    
+    public void setValueFlag(MetaFlag[] valueFlag) {
+        this.valueFlag = valueFlag;
+    }
 
-
-    public static PutRequest build(short ns, byte[] pkey, byte[] skey, int keyFlag, byte[] value, int valueFlag, TairOption opt) {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+    public static PutRequest build(short ns, byte[] pkey, byte[] skey, byte[] value, TairOption opt) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE || (skey != null && ((skey.length + pkey.length + PREFIX_KEY_TYPE.length)> TairConstant.MAX_KEY_SIZE))) {
@@ -86,7 +74,7 @@ public class PutRequest extends AbstractRequestPacket {
             throw new IllegalArgumentException(TairConstant.VALUE_NOT_AVAILABLE);
         }
         //we must create the instance
-        PutRequest request = new PutRequest(ns, pkey, skey, keyFlag, value, valueFlag, opt.getVersion(), opt.getExpire());
+        PutRequest request = new PutRequest(ns, pkey, skey, value, opt.getVersion(), opt.getExpire());
         return request;
     }
     public short getNamespace() {

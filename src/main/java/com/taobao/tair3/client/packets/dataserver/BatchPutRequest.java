@@ -10,11 +10,12 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import com.taobao.tair3.client.TairClient.TairOption;
 import com.taobao.tair3.client.packets.AbstractRequestPacket;
 import com.taobao.tair3.client.util.ByteArray;
+import com.taobao.tair3.client.util.TairConstant;
 
 public class BatchPutRequest extends AbstractRequestPacket {
     protected short namespace;
     protected short version;
-    protected int expired;
+    protected long expired;
     protected List<byte[]> keySet = new ArrayList<byte[]>();
     protected List<byte[]> valSet = new ArrayList<byte[]>();
     public void setNamespace(short namespace) {
@@ -26,7 +27,7 @@ public class BatchPutRequest extends AbstractRequestPacket {
     public void setVersion(short version) {
         this.version = version;
     }
-    public void setExpired(int expired) {
+    public void setExpired(long expired) {
         this.expired = expired;
     }
     
@@ -37,44 +38,40 @@ public class BatchPutRequest extends AbstractRequestPacket {
         this.valSet.add(val);
     }
     public void encodeTo(ChannelBuffer buffer) {
+        if (keySet.size() != valSet.size()) {
+            throw new IllegalArgumentException("key and val should be fully paired");
+        }
         buffer.writeByte((byte) 0); // 1
         buffer.writeShort(namespace); // 2
-        buffer.writeShort(version); //2 
-        buffer.writeInt(expired); //4
+        buffer.writeShort(version); // 2
+        buffer.writeLong(expired); // 8
 
-        buffer.writeInt(keySet.size()); //4
-        for (byte[] key : keySet) {
-            if (key == null) {
-                throw new IllegalArgumentException("key was null, BatchPutRequest::encodeTo");
-            }
-            encodeDataMeta(buffer); // 36
-            buffer.writeInt(key.length);  // 4
-            buffer.writeBytes(key);
-        }
+        buffer.writeInt(keySet.size()); // key count
+        encodeKeyOrValue(buffer, keySet);
         
-        buffer.writeInt(valSet.size()); //4
-        for (byte[] val : valSet) {
-            encodeDataMeta(buffer); // 36
-            buffer.writeInt(val.length);  // 4
-            buffer.writeBytes(val);
-        }
+        buffer.writeInt(valSet.size()); // value count
+        encodeKeyOrValue(buffer, valSet);
     }
 
     public int size() {
-        int s = 9;
-        for (byte[] k : keySet) {
-            s += 36 + 4 + k.length;
-        }
+        int s = 1;
+        s += 2;
+        s += 2;
+        s += 8;
+        
         s += 4;
-        for (byte[] v : valSet) {
-            s += 36 + 4 + v.length;
-        }
+        s += keyOrValueEncodedSize(keySet);
+        s += 4;
+        s += keyOrValueEncodedSize(valSet);
         return s;
     }
     public List<byte[]> getKeySet()  {
         return keySet;
     }
     public static BatchPutRequest build(short ns, byte[] key, byte[] val, TairOption opt) throws IllegalArgumentException {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
+            throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
+        }
         BatchPutRequest req = new BatchPutRequest();
         req.setExpired(opt.getExpire());
         req.setVersion(opt.getVersion());
@@ -84,6 +81,9 @@ public class BatchPutRequest extends AbstractRequestPacket {
         return req;
     }
     public static BatchPutRequest build(short ns, Map<ByteArray, byte[]> kv, TairOption opt) throws IllegalArgumentException {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
+            throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
+        }
         BatchPutRequest req = new BatchPutRequest();
         req.setExpired(opt.getExpire());
         req.setVersion(opt.getVersion());

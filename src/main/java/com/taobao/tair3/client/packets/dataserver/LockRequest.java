@@ -24,18 +24,16 @@ public class LockRequest extends AbstractRequestPacket {
     @Override
     public void encodeTo(ChannelBuffer buffer) {
         buffer.writeShort(namespace); // 2
-        buffer.writeInt(lockType); //4
-        encodeDataMeta(buffer); // 36
-        buffer.writeInt(key.length); //4
-        buffer.writeBytes(key);
+        buffer.writeInt(lockType); // 4
+        encodeKeyOrValue(buffer, key);
     }
     
     public int size() {
-        return 2 + 4 + 36 + 4 + key.length;
+        return 2 + 4 + keyOrValueEncodedSize(key);
     }
     
     public static LockRequest build(short ns, byte[] key, int lockType) throws IllegalArgumentException {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (key == null || key.length > TairConstant.MAX_KEY_SIZE) {

@@ -5,15 +5,15 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 
 public class IncDecResponse  extends AbstractResponsePacket {
-    protected int value = 0;
+    protected long value = 0;
     
-    public int getValue() {
+    public long getValue() {
         return value;
     }
     
     @Override
     public void decodeFrom(ChannelBuffer buffer) {
-        value = buffer.readInt();
+        value = buffer.readLong();
         resultCode = 0;
         return;
     }

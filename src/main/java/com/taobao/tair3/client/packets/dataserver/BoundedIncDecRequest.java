@@ -8,27 +8,27 @@ import com.taobao.tair3.client.TairClient.TairOption;
 import com.taobao.tair3.client.util.TairConstant;
 
 public class BoundedIncDecRequest extends IncDecRequest {
-    public BoundedIncDecRequest(short ns, byte[] pkey, byte[] skey, int count, int initValue, int expireTime, int lowBound, int upperBound) {
+    protected long lowBound = Long.MIN_VALUE;
+    protected long upperBound = Long.MAX_VALUE;
+    
+    public BoundedIncDecRequest(short ns, byte[] pkey, byte[] skey, long count, long initValue, long expireTime, long lowBound, long upperBound) {
         super(ns, pkey, skey, count, initValue, expireTime);
         this.lowBound = lowBound;
         this.upperBound = upperBound;
     }
 
-    protected int lowBound = Integer.MIN_VALUE;
-    protected int upperBound = Integer.MAX_VALUE;
-    
     @Override
     public void encodeTo(ChannelBuffer buffer) {
         super.encodeTo(buffer);
-        buffer.writeInt(lowBound);
-        buffer.writeInt(upperBound);
+        buffer.writeLong(lowBound);
+        buffer.writeLong(upperBound);
     }
     @Override
     public int size() {
-        return super.size() + 4 + 4;
+        return super.size() + 8 + 8;
     }
     
-    public static BoundedIncDecRequest build(short ns, byte[] pkey, byte[] skey, int value, int initValue, int lowBound, int upperBound, TairOption opt) throws IllegalArgumentException {
+    public static BoundedIncDecRequest build(short ns, byte[] pkey, byte[] skey, long value, long initValue, long lowBound, long upperBound, TairOption opt) throws IllegalArgumentException {
         if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }

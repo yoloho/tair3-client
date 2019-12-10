@@ -9,9 +9,9 @@ import com.taobao.tair3.client.util.TairUtil;
 
 public class IncDecRequest extends AbstractRequestPacket {
     protected short namespace = 0;
-    protected int count = 1;
-    protected int initValue = 0;
-    protected int expireTime = 0;
+    protected long count = 1;
+    protected long initValue = 0;
+    protected long expireTime = 0;
     // only two cases:
     // pkey != null && skey == null
     // pkey == null && skey != null
@@ -22,7 +22,7 @@ public class IncDecRequest extends AbstractRequestPacket {
     public short getNamespace() {
         return this.namespace;
     }
-    public IncDecRequest(short ns, byte[] pkey, byte[] skey, int count, int initValue, int expireTime) {
+    public IncDecRequest(short ns, byte[] pkey, byte[] skey, long count, long initValue, long expireTime) {
         this.namespace = ns;
         this.pkey = pkey;
         this.skey = skey;
@@ -35,33 +35,24 @@ public class IncDecRequest extends AbstractRequestPacket {
     public void encodeTo(ChannelBuffer buffer) {
         buffer.writeByte((byte)0); // 1
         buffer.writeShort(namespace); // 2
-        buffer.writeInt(count); // 4
-        buffer.writeInt(initValue); //4
-        buffer.writeInt(TairUtil.getDuration(expireTime)); //4
+        buffer.writeLong(count); // 8
+        buffer.writeLong(initValue); //8
+        buffer.writeLong(TairUtil.getDuration(expireTime)); // 8
         
-        int keySize = pkey.length;
-        if (skey != null) {
-            keySize += PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-        }
-        encodeDataMeta(buffer);
-        buffer.writeInt(keySize);
-        if (skey != null) {
-            buffer.writeBytes(PREFIX_KEY_TYPE);
-        }
-        buffer.writeBytes(pkey);
-        if (skey != null) {
-            buffer.writeBytes(skey);
-        }
+        encodeKeyOrValue(buffer, pkey, skey);
     }
     public int size() {
-        int s = 1 + 2 + 4 + 4 + 4 + 40 + pkey.length;
-        return skey != null ? (s + skey.length + PREFIX_KEY_TYPE.length) : s;
+        int s = 1;
+        s += 2;
+        s += 8; // val
+        s += 8; // init
+        s += 8; // expire
+        s += keyOrValueEncodedSize(pkey, skey);
+        return s;
     }
     
-    public static IncDecRequest build(short ns, byte[] pkey, byte[] skey, int value, int initValue, TairOption opt) throws IllegalArgumentException {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+    public static IncDecRequest build(short ns, byte[] pkey, byte[] skey, long value, long initValue, TairOption opt) throws IllegalArgumentException {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE) {

@@ -27,7 +27,7 @@ public class HideByProxyMultiRequest extends AbstractRequestPacket {
     }
     
     public static HideByProxyMultiRequest build(short ns, byte[] pkey, List<byte[]> skeys, String groupName) throws IllegalArgumentException {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE) {
@@ -53,31 +53,29 @@ public class HideByProxyMultiRequest extends AbstractRequestPacket {
         }
         out.writeByte((byte)0); // 1
         out.writeShort(namespace); // 2
-        out.writeInt(skeys.size());
+        out.writeInt(skeys.size()); // key count
         for (byte[] skey : skeys) {
             if (skey == null) {
                 throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
             }
-            int keySize = pkey.length + PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-            encodeDataMeta(out);
-            out.writeInt(keySize);
-            out.writeBytes(PREFIX_KEY_TYPE);
-            out.writeBytes(pkey);
-            out.writeBytes(skey);
+            encodeKeyOrValue(out, pkey, skey);
         }
-        out.writeInt(group.getBytes().length);
-        out.writeBytes(group.getBytes());
-        out.writeInt(isSync);
+        out.writeInt(group.getBytes().length); // group name length
+        out.writeBytes(group.getBytes()); // group name
+        out.writeInt(isSync); // sync
     }
 
     public int size() {
-        int s = 7;
+        int s = 1;
+        s += 2;
+        s += 4; // key count
         for (byte[] skey : skeys) {
-            s+= (4 + 36 + pkey.length + skey.length + PREFIX_KEY_TYPE.length);
+            s += keyOrValueEncodedSize(pkey, skey);
         }
-        return s + 4 + group.getBytes().length + 4;
+        s += 4;
+        s += group.getBytes().length;
+        s += 4;
+        return s;
     }
 
     @Override

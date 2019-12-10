@@ -3,7 +3,7 @@ package com.taobao.tair3.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.taobao.tair3.client.util.TairConstant;
+import com.taobao.tair3.client.util.TairConstant.MetaFlag;
 
 public class Result<T> {
     public static class ResultCode {
@@ -91,7 +91,7 @@ public class Result<T> {
 
         public String toString() {
             StringBuffer sb = new StringBuffer();
-            sb.append("[(Code:" + code + ") (Message:" + msg + ")]");
+            sb.append("[(Code:").append(code).append(") (Message:").append(msg).append(")]");
             return sb.toString();
         }
 
@@ -134,9 +134,9 @@ public class Result<T> {
     private byte[] key = null;
     private short prefixSize = 0;
     private short version;
-    private int expire;
-    private int modifyTime;
-    private int createTime;
+    private long expire;
+    private long modifyTime;
+    private long createTime;
     private int flag = 0;
 
     public Result() {
@@ -157,24 +157,24 @@ public class Result<T> {
         this.version = version;
     }
 
-    public int getExpire() {
+    public long getExpire() {
         return expire;
     }
 
-    public void setExpire(int expire) {
+    public void setExpire(long expire) {
         this.expire = expire;
     }
 
-    public int getModifyTime() {
+    public long getModifyTime() {
         return this.modifyTime;
     }
-    public void setModifyTime(int modify) {
+    public void setModifyTime(long modify) {
         this.modifyTime = modify;
     }
-    public void setCreateTime(int createTime) {
+    public void setCreateTime(long createTime) {
         this.createTime = createTime;
     }
-    public int getCreateTime() {
+    public long getCreateTime() {
         return createTime;
     }
     public void setCode(ResultCode code) {
@@ -221,21 +221,37 @@ public class Result<T> {
     }
 
     public boolean isLocked() {
-        return (this.flag  & TairConstant.TAIR_ITEM_FLAG_LOCKED) != 0;
+        return MetaFlag.LOCKED.test(this.flag);
     }
+    
     public boolean hasNext() {
-        return (this.flag  & TairConstant.TAIR_ITEM_FLAG_HAS_NEXT) != 0;
+        return MetaFlag.HAS_NEXT.test(this.flag);
     }
     
     public boolean isCounter() {
-        return (this.flag & TairConstant.TAIR_ITEM_FLAG_ADDCOUNT) != 0;
+        return MetaFlag.ADD_COUNT.test(this.flag);
     }
+    
+    public long getCounter() {
+        if (!isCounter() 
+                || !(result instanceof byte[])
+                || ((byte[])result).length != 8) {
+            throw new IllegalAccessError("Result is not a counter in byte[8] form");
+        }
+        byte[] data = (byte[]) result;
+        long val = 0;
+        for (int i = 7; i >= 0; i --) {
+            val <<= 8;
+            val |= (data[i] & 0xff);
+        }
+        return val;
+    }
+    
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("" + code + " Result:");
+        sb.append(code).append(" Result:");
         if (result instanceof byte[]) {
-            String str = new String((byte[]) result);
-            sb.append(str);
+            sb.append(new String((byte[]) result));
         } else {
             sb.append(result);
         }

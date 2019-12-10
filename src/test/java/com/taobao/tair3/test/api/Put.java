@@ -21,6 +21,7 @@ import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.error.TairTimeout;
 import com.taobao.tair3.client.util.ByteArray;
 import com.taobao.tair3.client.util.TairConstant;
+import com.taobao.tair3.client.util.TairConstant.MetaFlag;
 public class Put extends TestBase {
     public TairOption opt = new TairOption(50000000, (short)0, 0);
     @Test
@@ -28,7 +29,6 @@ public class Put extends TestBase {
         byte[] key = UUID.randomUUID().toString().getBytes();
         byte[] val = UUID.randomUUID().toString().getBytes();
         try {
-            ns = 120;
             Result<Void> r = tair.put(ns, key, val, opt);
             assertEquals(ResultCode.OK, r.getCode());
              
@@ -170,7 +170,7 @@ public class Put extends TestBase {
             assertEquals(new ByteArray(key), new ByteArray(g.getKey()));
             assertEquals(new ByteArray(val), new ByteArray(g.getResult()));
             assertEquals(1, g.getVersion());
-            assertEquals(0, g.getFlag());
+            assertEquals(MetaFlag.NEW_META.getVal(), g.getFlag());
             
             
             opt.setVersion((short)4);
@@ -187,7 +187,7 @@ public class Put extends TestBase {
             assertEquals(new ByteArray(key), new ByteArray(g1.getKey()));
             assertEquals(new ByteArray(val), new ByteArray(g1.getResult()));
             assertEquals(2, g1.getVersion());
-            assertEquals(0, g1.getFlag());
+            assertEquals(MetaFlag.NEW_META.getVal(), g1.getFlag());
              
             
         } catch (TairRpcError e) {

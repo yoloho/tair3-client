@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.ResultMap;
 import com.taobao.tair3.client.Result.ResultCode;
+import com.taobao.tair3.client.error.TairException;
 import com.taobao.tair3.client.error.TairFlowLimit;
 import com.taobao.tair3.client.error.TairRpcError;
 import com.taobao.tair3.client.error.TairTimeout;
@@ -29,6 +30,7 @@ public class BatchDelete extends TestBase {
         try {
             ResultMap<byte[], Result<Void>> bp = tair.batchPut(ns, kvs, null);
             assertEquals(ResultCode.OK, bp.getCode());
+            assertEquals(kvs.size(), bp.getResult().size());
             for (Map.Entry<byte[], Result<Void>> entry : bp.getResult().entrySet()) {
                 assertEquals(ResultCode.OK, entry.getValue().getCode());
             }
@@ -51,13 +53,11 @@ public class BatchDelete extends TestBase {
             for (Map.Entry<byte[], Result<byte[]>> entry : bg1.getResult().entrySet()) {
                 assertEquals(true, ResultCode.OK.equals(entry.getValue().getCode()) || ResultCode.NOTEXISTS.equals(entry.getValue().getCode()));
             }
-        } catch (TairRpcError e) {
-            assertEquals(false, true);
-        } catch (TairFlowLimit e) {
-            assertEquals(false, true);
-        } catch (TairTimeout e) {
+        } catch (TairException e) {
+            e.printStackTrace();
             assertEquals(false, true);
         } catch (InterruptedException e) {
+            e.printStackTrace();
             assertEquals(false, true);
         }
     }
@@ -178,13 +178,11 @@ public class BatchDelete extends TestBase {
             for (Map.Entry<byte[], Result<byte[]>> entry : bg.getResult().entrySet()) {
                 assertEquals(ResultCode.OK, entry.getValue().getCode());
             }
-        } catch (TairRpcError e) {
-            assertEquals(false, true);
-        } catch (TairFlowLimit e) {
-            assertEquals(false, true);
-        } catch (TairTimeout e) {
+        } catch (TairException e) {
+            e.printStackTrace();
             assertEquals(false, true);
         } catch (InterruptedException e) {
+            e.printStackTrace();
             assertEquals(false, true);
         } catch (IllegalArgumentException e) {
             assertEquals(TairConstant.NS_NOT_AVAILABLE, e.getMessage());

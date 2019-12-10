@@ -40,55 +40,26 @@ public class GetRequest extends AbstractRequestPacket {
         out.writeShort(namespace); // 2
         //single key
         if (pkey != null && keys == null) {
-            out.writeInt(1); // 4
-            int keySize = pkey.length ;
-            if (skey != null) {
-                keySize += PREFIX_KEY_TYPE.length;
-                keySize <<= 22;
-                keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-            }
-            encodeDataMeta(out); // 36
-            out.writeInt(keySize);  // 4
-            if (skey != null) {
-                out.writeBytes(PREFIX_KEY_TYPE);
-            }
-            out.writeBytes(pkey);
-            if (skey != null) {
-                out.writeBytes(skey);
-            }
-        }
-        else if (keys != null) {
-            out.writeInt(keys.size()); // 4
-            for (byte[] key : keys) {
-                encodeDataMeta(out); // 36
-                out.writeInt(key.length);
-                out.writeBytes(key);
-            }
-        }
-        else {
+            out.writeInt(1); // key count
+            encodeKeyOrValue(out, pkey, skey);
+        } else if (keys != null) {
+            out.writeInt(keys.size()); // key count
+            encodeKeyOrValue(out, keys);
+        } else {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
     }
 
     public int size() {
-        int s = 7;
+        int s = 1;
+        s += 2; // ns
+        s += 4; // key count
         if (pkey != null && keys == null) {
-            s += (40 + pkey.length);
-            if (skey != null) {
-                s += skey.length;
-                s += PREFIX_KEY_TYPE.length;
-            }
-        } 
-        else if (keys != null) {
-            for (byte[] key : keys) {
-                if (key != null) {
-                    s += (40 + key.length);
-                }
-            }
-        }
-        else {
-            s = 0;
-            //never to be here.!!!
+            s += keyOrValueEncodedSize(pkey, skey);
+        } else if (keys != null) {
+            s += keyOrValueEncodedSize(keys);
+        } else {
+            throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
         return s;
     }

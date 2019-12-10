@@ -11,8 +11,8 @@ import com.taobao.tair3.client.Result.ResultCode;
 import com.taobao.tair3.client.TairClient.Pair;
 
 
-public class PrefixAddCountBoundedMultiCast implements TairResultCast<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>> {
-    public Result<ResultMap<byte[], Result<Integer>>> cast(PrefixIncDecResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
+public class PrefixAddCountBoundedMultiCast implements TairResultCast<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>> {
+    public Result<ResultMap<byte[], Result<Long>>> cast(PrefixIncDecResponse s, Object context) throws TairRpcError, TairCastIllegalContext {
          if (context == null || !(context instanceof Pair<?, ?>)) {
             throw new  TairCastIllegalContext("context of PrefixAddCountMultiCast.");
         }
@@ -22,12 +22,12 @@ public class PrefixAddCountBoundedMultiCast implements TairResultCast<PrefixIncD
         byte[] pkey = pair.first();
 
         
-        Result<ResultMap<byte[], Result<Integer>>> result = new Result<ResultMap<byte[], Result<Integer>>>();
-        ResultMap<byte[], Result<Integer>> resultMap = s.getResults();
+        Result<ResultMap<byte[], Result<Long>>> result = new Result<ResultMap<byte[], Result<Long>>>();
+        ResultMap<byte[], Result<Long>> resultMap = s.getResults();
         ResultCode code = ResultCode.castResultCode(s.getCode());
         result.setCode(code);
         if (resultMap == null) {
-            resultMap = new ResultMap<byte[], Result<Integer>>(0);
+            resultMap = new ResultMap<byte[], Result<Long>>(0);
         }
         resultMap.setCode(code);
         resultMap.setKey(pkey);

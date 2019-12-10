@@ -1,19 +1,35 @@
 package com.taobao.tair3.client.util;
 
 public class TairConstant {
-    
     public static int  NAMESPACE_MAX = Short.MAX_VALUE;
+    
+    public static enum MetaFlag {
+        HAS_NEXT(1), // only for response XXX to be verified
+        ADD_COUNT(1), // meta of value
+        DELETED(2),
+        ITEM(4),
+        LOCKED(8),
+        NEW_META(16);
+        
+        private int val;
+        private MetaFlag(int val) {
+            this.val = val;
+        }
+        public int getVal() {
+            return val;
+        }
+        public boolean test(int flag) {
+            return (this.val & flag) > 0;
+        }
+    }
      
-    public static int TAIR_ITEM_FLAG_ADDCOUNT = 1;
-    public static int TAIR_ITEM_FLAG_DELETED = 2;
-    public static int TAIR_ITEM_FLAG_ITEM = 4;
-    public static int TAIR_ITEM_FLAG_LOCKED = 8;
     public static int TAIR_ITEM_FLAG_HAS_NEXT = 8;
 
     public static short TAIR_STYPE_MIXEDKEY = 12;
     public static short TAIR_STYPE_BYTEARRAY = 9;
     public static final int TAIR_STYPE_INCDATA = 11;
     public static final short PREFIX_KEY_OFFSET = 22;
+    public static final int MASK_KEY_LENGTH = 0x3fffff;
     //get range
     public static final short RANGE_ALL  = 1;
     public static final short RANGE_ALL_REVERSE  = 4;

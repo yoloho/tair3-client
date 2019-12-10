@@ -48,58 +48,58 @@ public interface TairClient {
         public short getVersion() {
             return requestOption.version;
         }
-        public int getExpire() {
+        public long getExpire() {
             return requestOption.expire;
         }
     }
 
     public static class RequestOption {
         private short version;
-        private int expire;
+        private long expire;
         public void setVersion(short version) {
             this.version = version;
         }
-        public void setExpire(int expire) {
+        public void setExpire(long expire) {
             this.expire = expire;
         }
         public short getVersion() {
             return version;
         }
-        public int getExpire() {
+        public long getExpire() {
             return expire;
         }
         public RequestOption() {
             this.version = 0;
             this.expire = 0;
         }
-        public RequestOption(short version, int expire) {
+        public RequestOption(short version, long expire) {
             this.version = version;
             this.expire = expire;
         }
     }
 
     public static class Counter {
-        private int value = 0;
-        private int initValue = 0;
-        private int expire = 0;
+        private long value = 0;
+        private long initValue = 0;
+        private long expire = 0;
         public Counter() {
             
         }
-        public Counter(int value, int initValue, int expire) {
+        public Counter(long value, long initValue, long expire) {
             this.value = value;
             this.initValue = initValue;
             this.expire = expire;
         }
-        public int getValue() {
+        public long getValue() {
             return value;
         }
-        public int getInitValue() {
+        public long getInitValue() {
             return initValue;
         }
-        public int getExpire() {
+        public long getExpire() {
             return expire;
         }
-        public void setExpire(int expire) {
+        public void setExpire(long expire) {
             this.expire = expire;
         }
         public void negated() {
@@ -133,15 +133,15 @@ public interface TairClient {
 
     public Future<ResultMap<byte[], Result<byte[]>>> batchGetAsync(short ns, final List<byte[]> keys, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Void>> setCountAsync(short ns, byte[] key, int count, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Void>> setCountAsync(short ns, byte[] key, long count, TairOption opt) throws TairRpcError, TairFlowLimit;
      
-    public Future<Result<Integer>> incrAsync(short ns, byte[] key, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> incrAsync(short ns, byte[] key, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
      
-    public Future<Result<Integer>> decrAsync(short ns, byte[] key, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> decrAsync(short ns, byte[] key, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
      
-    public Future<Result<Integer>> incrAsync(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> incrAsync(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
      
-    public Future<Result<Integer>> decrAsync(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> decrAsync(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
 
     public Future<Result<Void>> lockAsync(short ns, byte[] key, TairOption opt) throws TairRpcError, TairFlowLimit;
      
@@ -157,17 +157,17 @@ public interface TairClient {
 
     public Future<Result<byte[]>> prefixGetAsync(short ns, byte[] pkey, byte[] skey, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Void>> prefixSetCountAsync(short ns, byte[] pkey, byte[] skey, int count, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Void>> prefixSetCountAsync(short ns, byte[] pkey, byte[] skey, long count, TairOption opt) throws TairRpcError, TairFlowLimit;
     
     public Future<Result<byte[]>> prefixGetHiddenAsync(short ns, byte[] pkey, byte[] skey, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Integer>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Integer>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, int value, int initValue, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, long value, long initValue, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Integer>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
     
-    public Future<Result<Integer>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, int value, int initValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
+    public Future<Result<Long>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, long value, long initValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit;
     
     
     public Future<Result<Void>> hideByProxyAsync(short ns, byte[] key, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException;
@@ -196,9 +196,9 @@ public interface TairClient {
     
     public Future<ResultMap<byte[], Result<Map<byte[], Result<byte[]>>>>> batchPrefixGetHiddenMultiAsync(short ns, Map<byte[], List<byte[]>> kvs, TairOption opt)  throws TairRpcError, TairFlowLimit;
     
-    public Future<ResultMap<byte[], Result<Integer>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit;
+    public Future<ResultMap<byte[], Result<Long>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit;
     
-    public Future<ResultMap<byte[], Result<Integer>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit;
+    public Future<ResultMap<byte[], Result<Long>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit;
     
     public Future<Result<List<Pair<byte[], Result<byte[]>>>>> getRangeAsync(short ns, byte[] pkey, byte[] begin, byte[] end, int offset, int maxCount, boolean reverse, TairOption opt) throws TairRpcError, TairFlowLimit;
     

@@ -44,70 +44,38 @@ public class InvalidByProxyRequest extends AbstractRequestPacket {
         }
         this.keys = keys;
     }
-    protected void encodeSingleKey(ChannelBuffer out) {
-        out.writeByte((byte) 0); // 1
-        out.writeShort(namespace); // 2
-        out.writeInt(1); // 4, only one key
-        int keySize = pkey.length;
-        if (skey != null) {
-            keySize += PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-        }
-        encodeDataMeta(out); // 36
-        out.writeInt(keySize); // 4
-        if (skey != null) {
-            out.writeBytes(PREFIX_KEY_TYPE);
-        }
-        out.writeBytes(pkey);
-        if (skey != null) {
-            out.writeBytes(skey);
-        }
-        out.writeInt(group.getBytes().length);
-        out.writeBytes(group.getBytes());
-        out.writeInt(isSync);
-    }
 
-    protected void encodeMultiKeys(ChannelBuffer out) {
-        out.writeByte((byte)0); // 1
-        out.writeShort(namespace); // 2
-        out.writeInt(keys.size()); // 4
-        for (byte[] key : keys) {
-            encodeDataMeta(out); // 36
-            int keySize = key.length;
-            out.writeInt(keySize);
-            out.writeBytes(key);
-        }
-        out.writeInt(group.getBytes().length);
-        out.writeBytes(group.getBytes());
-        out.writeInt(isSync);
-    }
     @Override
     public void encodeTo(ChannelBuffer out) {
-        if (keys != null) {
-            encodeMultiKeys(out);
+        out.writeByte((byte)0); // 1
+        out.writeShort(namespace); // 2
+        if (keys == null) {
+            out.writeInt(1); // 4, only one key
+            encodeKeyOrValue(out, pkey, skey);
+        } else {
+            out.writeInt(keys.size()); // key count
+            encodeKeyOrValue(out, keys);
         }
-        else {
-            encodeSingleKey(out);
-        }
+        out.writeInt(group.getBytes().length);
+        out.writeBytes(group.getBytes());
+        out.writeInt(isSync);
     }
     
     @Override
     public int size() {
-        int s = 0;
+        int s = 1;
+        s += 2;
+        s += 4;
         if (keys == null) {
-            s = 7 + 36 + 4 + pkey.length + 4 + group.getBytes().length + 4;
-            if (skey != null) {
-                s += skey.length;
-            }
+            // single
+            s += keyOrValueEncodedSize(pkey, skey);
+        } else {
+            // multi
+            keyOrValueEncodedSize(keys);
         }
-        else {
-            s += 7;
-            for (byte[] key : keys) {
-                s += (40 + key.length);
-            }
-        }
-        s += (4 + group.getBytes().length + 4);
+        s += 4; // group name length
+        s += group.getBytes().length;
+        s += 4;
         return s;
     }
     

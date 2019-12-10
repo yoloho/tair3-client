@@ -37,7 +37,7 @@ public class InvalidByProxyMultiRequest extends AbstractRequestPacket {
     }
     
     public static InvalidByProxyMultiRequest build(short ns, List<byte[]> keys, String groupName) throws IllegalArgumentException {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (keys == null ) {
@@ -73,37 +73,26 @@ public class InvalidByProxyMultiRequest extends AbstractRequestPacket {
     public void encodeTo(ChannelBuffer out) {
         out.writeByte((byte)0); // 1
         out.writeShort(namespace); // 2
-        out.writeInt(keys.size()); // 4
+        out.writeInt(keys.size()); // key count
         for (byte[] key : keys) {
-            encodeDataMeta(out); // 36
-            int keySize = key.length;
-            if (pkey != null) {
-                keySize = pkey.length + PREFIX_KEY_TYPE.length;
-                keySize <<= 22;
-                keySize |= (pkey.length + key.length + PREFIX_KEY_TYPE.length);
-            }
-            out.writeInt(keySize);
-            if (pkey != null) {
-                out.writeBytes(PREFIX_KEY_TYPE);
-                out.writeBytes(pkey);
-            }
-            out.writeBytes(key);
+            encodeKeyOrValue(out, pkey, key);
         }
-        out.writeInt(group.getBytes().length);
-        out.writeBytes(group.getBytes());
-        out.writeInt(isSync);
+        out.writeInt(group.getBytes().length); // group name length
+        out.writeBytes(group.getBytes()); // group name
+        out.writeInt(isSync); // sync
     }
     @Override
     public int size() {
-        int s = 1 + 2 + 4;
+        int s = 1;
+        s += 2;
+        s += 4; // key count
         for (byte[] key : keys) {
-            s += ( key.length + 40);
-            if (pkey != null) {
-                s += pkey.length;
-                s += PREFIX_KEY_TYPE.length;
-            }
+            s += keyOrValueEncodedSize(pkey, key);
         }
-        return s + 4 + group.getBytes().length + 4;
+        s += 4;
+        s += group.getBytes().length;
+        s += 4;
+        return s;
     }
     @Override
     public short getNamespace() {

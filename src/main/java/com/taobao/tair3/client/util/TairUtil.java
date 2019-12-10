@@ -118,17 +118,21 @@ public class TairUtil {
     }
     
     
-    public static byte[] encodeCountValue(int count) {
+    public static byte[] encodeCountValue(long count) {
         // Tair server cope with IncData by little-endian(dependable)
         int flag = TairConstant.TAIR_STYPE_INCDATA;
         flag <<= 1;
-        byte[] b = new byte[6];
+        byte[] b = new byte[10];
         b[1] = (byte) (flag & 0xFF);
         b[0] = (byte) ((flag >> 8) & 0xFF);
         b[2] = (byte) (count & 0xFF);
         b[3] = (byte) ((count >> 8) & 0xFF);
         b[4] = (byte) ((count >> 16) & 0xFF);
         b[5] = (byte) ((count >> 24) & 0xFF);
+        b[6] = (byte) ((count >> 32) & 0xFF);
+        b[7] = (byte) ((count >> 40) & 0xFF);
+        b[8] = (byte) ((count >> 48) & 0xFF);
+        b[9] = (byte) ((count >> 56) & 0xFF);
         return b;
     }
     public static int decodeCountValue(byte [] b) {
@@ -160,8 +164,8 @@ public class TairUtil {
         return skeyList;
     }
 
-    public static int getDuration(int expiretime) {
-        int now = (int)(System.currentTimeMillis() / 1000);
+    public static long getDuration(long expiretime) {
+        long now = System.currentTimeMillis() / 1000;
         if (expiretime > now) {
             expiretime -= now;
         }

@@ -1,4 +1,5 @@
 package com.taobao.tair3.client.packets.dataserver;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import com.taobao.tair3.client.packets.AbstractResponsePacket;
 import com.taobao.tair3.client.Result;
@@ -10,14 +11,14 @@ public class PrefixIncDecResponse  extends AbstractResponsePacket {
     private int configVersion ;
     private int successCount = 0;
     private int failedCount = 0;
-    private ResultMap<byte[], Result<Integer>> datas = null;
+    private ResultMap<byte[], Result<Long>> datas = null;
     public int getSuccessCount() {
         return successCount;
     }
     public int getFailedCount() {
         return failedCount;
     }
-    public ResultMap<byte[], Result<Integer>> getResults() {
+    public ResultMap<byte[], Result<Long>> getResults() {
         return datas;
     }
 
@@ -33,15 +34,15 @@ public class PrefixIncDecResponse  extends AbstractResponsePacket {
         this.successCount = buffer.readInt();
         
         if (this.successCount > 0) {
-            datas = new ResultMap<byte[], Result<Integer>> (this.successCount);
+            datas = new ResultMap<byte[], Result<Long>> (this.successCount);
             for (int i = 0; i < successCount; ++i) {
                 decodeMeta(buffer);
                 size = buffer.readInt();
                 if (size > 0) {
                     byte[] key = new byte[size];
                     buffer.readBytes(key);
-                    int value = buffer.readInt();
-                    Result<Integer> r = new Result<Integer>();
+                    long value = buffer.readLong();
+                    Result<Long> r = new Result<Long>();
                     r.setCode(ResultCode.OK);
                     r.setResult(value);
                     r.setKey(key);
@@ -53,7 +54,7 @@ public class PrefixIncDecResponse  extends AbstractResponsePacket {
         this.failedCount = buffer.readInt();
         if (failedCount > 0) {
             if (datas == null) {
-                datas = new ResultMap<byte[], Result<Integer>> (this.failedCount);
+                datas = new ResultMap<byte[], Result<Long>> (this.failedCount);
             }
             for (int i = 0; i < this.failedCount; ++i) {
                 decodeMeta(buffer);
@@ -62,7 +63,7 @@ public class PrefixIncDecResponse  extends AbstractResponsePacket {
                     byte[] key = new byte[size];
                     buffer.readBytes(key);
                     int rc = buffer.readInt();
-                    Result<Integer> r = new Result<Integer>();
+                    Result<Long> r = new Result<Long>();
                     r.setCode(ResultCode.castResultCode(rc));
                     r.setResult(null);
                     datas.put(key, r);

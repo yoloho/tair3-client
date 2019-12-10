@@ -20,14 +20,14 @@ public class IncrAndDecr extends TestBase {
         int value2 = 5;
         int defaultValue = 1;
         try {
-            Result<Integer> i = tair.incr(ns, key, value, defaultValue, null);
+            Result<Long> i = tair.incr(ns, key, value, defaultValue, null);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue), i.getResult().intValue());
             assertEquals(0, i.getVersion());
             
             
              
-            Result<Integer> d = tair.decr(ns, key, value2, defaultValue, null);
+            Result<Long> d = tair.decr(ns, key, value2, defaultValue, null);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue - value2), d.getResult().intValue());
             assertEquals(0, d.getVersion());
@@ -53,14 +53,14 @@ public class IncrAndDecr extends TestBase {
         int value2 = 5;
         int defaultValue = 1;
         try {
-            Result<Integer> i = tair.incr(ns, null, value, defaultValue, null);
+            Result<Long> i = tair.incr(ns, null, value, defaultValue, null);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue), i.getResult().intValue());
             assertEquals(0, i.getVersion());
             
             
              
-            Result<Integer> d = tair.decr(ns, key, value2, defaultValue, null);
+            Result<Long> d = tair.decr(ns, key, value2, defaultValue, null);
             assertEquals(ResultCode.OK, d.getCode());
             assertEquals((value + defaultValue - value2), d.getResult().intValue());
             assertEquals(0, d.getVersion());
@@ -89,7 +89,7 @@ public class IncrAndDecr extends TestBase {
         int defaultValue = 1;
         try {
             TairOption opt = new TairOption(500000, (short)0, 2);
-            Result<Integer> i = tair.incr(ns, key, value, defaultValue, opt);
+            Result<Long> i = tair.incr(ns, key, value, defaultValue, opt);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue), i.getResult().intValue());
             assertEquals(0, i.getVersion());
@@ -99,7 +99,7 @@ public class IncrAndDecr extends TestBase {
             Result<byte[]>  g = tair.get(ns, key, null);
             assertEquals(ResultCode.NOTEXISTS, g.getCode());
             
-            Result<Integer> d = tair.decr(ns, key, value2, defaultValue, null);
+            Result<Long> d = tair.decr(ns, key, value2, defaultValue, null);
             assertEquals(ResultCode.OK, d.getCode());
             assertEquals(0, d.getVersion());
         } catch (TairRpcError e) {
@@ -132,7 +132,7 @@ public class IncrAndDecr extends TestBase {
             assertEquals(ResultCode.OK, p.getCode());
             
              
-            Result<Integer> i = tair.incr(ns, key, value, defaultValue, null);
+            Result<Long> i = tair.incr(ns, key, value, defaultValue, null);
             assertEquals(ResultCode.CANNOT_OVERRIDE, i.getCode());
             
              
@@ -140,7 +140,7 @@ public class IncrAndDecr extends TestBase {
             Result<byte[]>  g = tair.get(ns, key, null);
             assertEquals(ResultCode.OK, g.getCode());
             
-            Result<Integer> d = tair.decr(ns, key, value2, defaultValue, null);
+            Result<Long> d = tair.decr(ns, key, value2, defaultValue, null);
             assertEquals(ResultCode.CANNOT_OVERRIDE, d.getCode());
         } catch (TairRpcError e) {
             e.printStackTrace();
@@ -167,13 +167,13 @@ public class IncrAndDecr extends TestBase {
             Result<Void> s = tair.setCount(ns, key, defaultValue, null);
             assertEquals(ResultCode.OK, s.getCode());
             
-            Result<Integer> i = tair.incr(ns, key, value, 2, null);
+            Result<Long> i = tair.incr(ns, key, value, 2, null);
             assertEquals(ResultCode.OK, i.getCode());
             assertEquals((value + defaultValue), i.getResult().intValue());
              
              
             
-            Result<Integer> d = tair.decr(ns, key, value2, 0, null);
+            Result<Long> d = tair.decr(ns, key, value2, 0, null);
             assertEquals(ResultCode.OK, d.getCode());
             assertEquals((value + defaultValue - value2), d.getResult().intValue());
          

@@ -26,43 +26,20 @@ public class GetResponse extends AbstractResponsePacket {
     
     @Override
     public void decodeFrom(ChannelBuffer buff) {
-        resultCode 		= buff.readInt();
-        int count   = buff.readInt();
-        int size = 0;
-
-        //entries = new ArrayList<DataEntry>(count);
+        resultCode = buff.readInt(); // rc
+        int count = buff.readInt(); // value count
+        
         datas = new ArrayList<Result<byte[]>>(count);
         for (int i = 0; i < count; i++) {
             Result<byte[]> r = new Result<byte[]>();
-            
-            decodeMeta(buff, r);
-            int msize = buff.readInt();
-            size = (msize & 0x3FFFFF);
-            short prefixSize = (short)(msize >> 22);
-
-            //with prefix key
-            if (prefixSize != 0) {
-                size -= PREFIX_KEY_TYPE.length;
-                prefixSize -= PREFIX_KEY_TYPE.length;
-                //two bytes flag
-                //buff.readShort();
-                buff.skipBytes(PREFIX_KEY_TYPE.length);
-            }
-            byte[] keyBytes = new byte[size];
-            buff.readBytes(keyBytes);
-            r.setKey(keyBytes, prefixSize);
-         
-            decodeMeta(buff);
-            int valLength = buff.readInt();
-            byte[] valBytes = new byte[valLength];
-            buff.readBytes(valBytes);
+            decodeKey(buff, r);
+            byte[] value = decodeValue(buff);
             if (r.isCounter()) {
-                byte[] rowCount = new byte[4];
-                System.arraycopy(valBytes, 2, rowCount, 0, 4);
+                byte[] rowCount = new byte[8];
+                System.arraycopy(value, 2, rowCount, 0, rowCount.length);
                 r.setResult(rowCount);
-            }
-            else {
-                r.setResult(valBytes);
+            } else {
+                r.setResult(value);
             }
             datas.add(r);
         }

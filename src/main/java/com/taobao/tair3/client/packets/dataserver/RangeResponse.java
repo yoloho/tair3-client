@@ -54,7 +54,7 @@ public class RangeResponse extends AbstractResponsePacket {
                 r.setCode(code);
                 decodeMeta(buff, r);
                 int msize = buff.readInt();
-                size = (msize & 0x3FFFFF);
+                size = (msize & TairConstant.MASK_KEY_LENGTH);
                 byte[] key = null;
                 if (size > 0) {
                     key = new byte[size];
@@ -72,8 +72,7 @@ public class RangeResponse extends AbstractResponsePacket {
                     kvDatas.add(new Pair<byte[], Result<byte[]>>(key, r));
                 }
             }
-        }
-        else {
+        } else {
             datas = new ArrayList<Result<byte[]>> (count);
             for (int i = 0; i < count; ++i) {
                 Result<byte[]> r = new Result<byte[]> ();
@@ -81,7 +80,7 @@ public class RangeResponse extends AbstractResponsePacket {
                         || type == TairConstant.RANGE_DEL || type == TairConstant.RANGE_DEL_REVERSE) {
                     decodeMeta(buff, r);
                     int msize = buff.readInt();
-                    size = (msize & 0x3FFFFF);
+                    size = (msize & TairConstant.MASK_KEY_LENGTH);
                     if (size > 0) {
                         byte[] key = new byte[size];
                         buff.readBytes(key);

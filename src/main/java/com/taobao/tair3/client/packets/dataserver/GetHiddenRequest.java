@@ -17,7 +17,7 @@ public class GetHiddenRequest  extends AbstractRequestPacket {
         return this.namespace;
     }
     public static GetHiddenRequest build(short ns, byte[] pkey, byte[] skey) throws IllegalArgumentException {
-        if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
+        if (ns < 0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }
         if (pkey == null || pkey.length > TairConstant.MAX_KEY_SIZE) {
@@ -34,29 +34,14 @@ public class GetHiddenRequest  extends AbstractRequestPacket {
         out.writeByte(0);
         out.writeShort(namespace);
         out.writeInt(1); // only one key
-        int keySize = pkey.length;
-        if (skey != null) {
-            keySize += PREFIX_KEY_TYPE.length;
-            keySize <<= 22;
-            keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-        }
-        encodeDataMeta(out);
-        out.writeInt(keySize);
-        if (skey != null) {
-            out.writeBytes(PREFIX_KEY_TYPE);
-        }
-        out.writeBytes(pkey);
-        if (skey != null) {
-            out.writeBytes(skey);
-        }
+        encodeKeyOrValue(out, pkey, skey);
     }
     @Override
     public int size() {
-        int s = 1 + 2 + 4 + 36 + 4 + pkey.length;
-        if (skey != null) {
-            s += skey.length;
-            s += PREFIX_KEY_TYPE.length;
-        }
+        int s = 1;
+        s += 2;
+        s += 4; // key count
+        s += keyOrValueEncodedSize(pkey, skey);
         return s;
     }
 }

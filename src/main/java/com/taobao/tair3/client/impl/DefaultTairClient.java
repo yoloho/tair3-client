@@ -37,33 +37,33 @@ public class DefaultTairClient extends AbstractTairClient {
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
-    public Result<Integer> incr(short ns, byte[] key, int value, int defaultValue, TairOption opt)
+    public Result<Long> incr(short ns, byte[] key, long value, long defaultValue, TairOption opt)
             throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
         if (value < 0) {
             throw new IllegalArgumentException(TairConstant.ITEM_VALUE_NOT_AVAILABLE);
         }
-        Future<Result<Integer>> future = incrAsync(ns, key, value, defaultValue, opt);
+        Future<Result<Long>> future = incrAsync(ns, key, value, defaultValue, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
     
-    public Result<Integer> incr(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt)
+    public Result<Long> incr(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt)
             throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = incrAsync(ns, key, value, defaultValue, lowBound, upperBound, opt);
+        Future<Result<Long>> future = incrAsync(ns, key, value, defaultValue, lowBound, upperBound, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
-    public Result<Integer> decr(short ns, byte[] key, int value, int defaultValue, TairOption opt)
+    public Result<Long> decr(short ns, byte[] key, long value, long defaultValue, TairOption opt)
             throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
         if (value < 0) {
             throw new IllegalArgumentException(TairConstant.ITEM_VALUE_NOT_AVAILABLE);
         }
-        Future<Result<Integer>> future = decrAsync(ns, key, value, defaultValue, opt);
+        Future<Result<Long>> future = decrAsync(ns, key, value, defaultValue, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
-    public Result<Integer> decr(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt)
+    public Result<Long> decr(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt)
             throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = decrAsync(ns, key, value, defaultValue, lowBound, upperBound, opt);
+        Future<Result<Long>> future = decrAsync(ns, key, value, defaultValue, lowBound, upperBound, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
@@ -122,7 +122,7 @@ public class DefaultTairClient extends AbstractTairClient {
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
-    public ResultMap<byte[], Result<Void>> prefixSetCountMulti(short ns, byte[] pkey, final Map<byte[], Pair<Integer, RequestOption>> kvs, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+    public ResultMap<byte[], Result<Void>> prefixSetCountMulti(short ns, byte[] pkey, final Map<byte[], Pair<Long, RequestOption>> kvs, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
         Future<ResultMap<byte[], Result<Void>>> future = prefixSetCountMultiAsync(ns, pkey, kvs, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
@@ -137,50 +137,50 @@ public class DefaultTairClient extends AbstractTairClient {
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
     
-    public Result<Void> setCount(short ns, byte[] key, int count, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+    public Result<Void> setCount(short ns, byte[] key, long count, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
         Future<Result<Void>> future = this.setCountAsync(ns, key, count, opt);
         return futureGet(future,opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
-    public Result<Void> prefixSetCount(short ns, byte[] pkey, byte[] skey, int count, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+    public Result<Void> prefixSetCount(short ns, byte[] pkey, byte[] skey, long count, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
         Future<Result<Void>> future = this.prefixSetCountAsync(ns, pkey, skey, count, opt);
         return futureGet(future,opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
 
 
-    public Result<Integer> prefixIncr(short ns, byte[] pkey, byte[] skey, int value, int initValue, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = prefixIncrAsync(ns, pkey, skey, value, initValue, opt);
+    public Result<Long> prefixIncr(short ns, byte[] pkey, byte[] skey, long value, long initValue, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<Result<Long>> future = prefixIncrAsync(ns, pkey, skey, value, initValue, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
-    public Result<Integer> prefixIncr(short ns, byte[] pkey, byte[] skey, int value, int initValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = prefixIncrAsync(ns, pkey, skey, value, initValue, lowBound, upperBound, opt);
-        return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
-    }
-    
-    public Result<Integer> prefixDecr(short ns, byte[] pkey, byte[] skey, int value, int initValue, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = prefixDecrAsync(ns, pkey, skey, value, initValue, opt);
-        return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
-    }
-    public Result<Integer> prefixDecr(short ns, byte[] pkey, byte[] skey, int value, int initValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<Result<Integer>> future = prefixDecrAsync(ns, pkey, skey, value, initValue, lowBound, upperBound, opt);
+    public Result<Long> prefixIncr(short ns, byte[] pkey, byte[] skey, long value, long initValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<Result<Long>> future = prefixIncrAsync(ns, pkey, skey, value, initValue, lowBound, upperBound, opt);
         return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
     
-    public ResultMap<byte[], Result<Integer>> prefixIncrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<ResultMap<byte[], Result<Integer>>> futureSet = prefixIncrMultiAsync(ns, pkey, skv, opt);
+    public Result<Long> prefixDecr(short ns, byte[] pkey, byte[] skey, long value, long initValue, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<Result<Long>> future = prefixDecrAsync(ns, pkey, skey, value, initValue, opt);
+        return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
+    }
+    public Result<Long> prefixDecr(short ns, byte[] pkey, byte[] skey, long value, long initValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<Result<Long>> future = prefixDecrAsync(ns, pkey, skey, value, initValue, lowBound, upperBound, opt);
+        return futureGet(future, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
+    }
+    
+    public ResultMap<byte[], Result<Long>> prefixIncrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<ResultMap<byte[], Result<Long>>> futureSet = prefixIncrMultiAsync(ns, pkey, skv, opt);
         return futureGet(futureSet, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
-    public ResultMap<byte[], Result<Integer>> prefixIncrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<ResultMap<byte[], Result<Integer>>> futureSet = prefixIncrMultiAsync(ns, pkey, skv, lowBound, upperBound, opt);
+    public ResultMap<byte[], Result<Long>> prefixIncrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<ResultMap<byte[], Result<Long>>> futureSet = prefixIncrMultiAsync(ns, pkey, skv, lowBound, upperBound, opt);
         return futureGet(futureSet, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
     
-    public ResultMap<byte[], Result<Integer>> prefixDecrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<ResultMap<byte[], Result<Integer>>> futureSet = prefixDecrMultiAsync(ns, pkey, skv, opt);
+    public ResultMap<byte[], Result<Long>> prefixDecrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<ResultMap<byte[], Result<Long>>> futureSet = prefixDecrMultiAsync(ns, pkey, skv, opt);
         return futureGet(futureSet, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
-    public ResultMap<byte[], Result<Integer>> prefixDecrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
-        Future<ResultMap<byte[], Result<Integer>>> futureSet = prefixDecrMultiAsync(ns, pkey, skv, lowBound, upperBound, opt);
+    public ResultMap<byte[], Result<Long>> prefixDecrMulti(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit, TairTimeout, InterruptedException {
+        Future<ResultMap<byte[], Result<Long>>> futureSet = prefixDecrMultiAsync(ns, pkey, skv, lowBound, upperBound, opt);
         return futureGet(futureSet, opt != null ? opt.getTimeout() : defaultOptions.getTimeout());
     }
     
@@ -287,4 +287,5 @@ public class DefaultTairClient extends AbstractTairClient {
             throw new TairTimeout(e);
         }
     }
+
 }

@@ -32,20 +32,19 @@ public class PrefxiPutObjectAndCounterMulti extends TestBase {
         for (int i = 0; i < keyCount; i++) {
             byte[] skey = skeys.get(i);
             if (i % 2 == 0) {
-                kvs.put(skey, new Pair<byte[], RequestOption>(UUID.randomUUID().toString().getBytes(), new RequestOption()));
-            }
-            else {
-                cvs.put(skey, new Pair<Integer, RequestOption>(0, new RequestOption()));
+                kvs.put(skey, new Pair<byte[], RequestOption>(UUID.randomUUID().toString().getBytes(), opt.getRequestOption()));
+            } else {
+                cvs.put(skey, new Pair<Integer, RequestOption>(0, opt.getRequestOption()));
                 cskeys.add(skey);
             }
         }
         int value = 10;
         Map<byte[], Counter> skv = new HashMap<byte[], Counter>();
         for (byte[] skey : cskeys) {
-            skv.put(skey, new Counter(value,0,0));
+            skv.put(skey, new Counter(value, 0, 500));
         }
         try {
-            ResultMap<byte[], Result<Void>> pm = tair.prefixPutMulti(ns, pkey, kvs, cvs, null);
+            ResultMap<byte[], Result<Void>> pm = tair.prefixPutMulti(ns, pkey, kvs, cvs, opt);
             assertEquals(ResultCode.OK, pm.getCode());
             for (Map.Entry<byte[], Result<Void>> e : pm.getResult().entrySet()) {
                 assertEquals(ResultCode.OK, e.getValue().getCode());
@@ -57,24 +56,24 @@ public class PrefxiPutObjectAndCounterMulti extends TestBase {
                 assertEquals(ResultCode.OK, e.getValue().getCode());
             }
             
-            ResultMap<byte[], Result<Integer>> im = tair.prefixIncrMulti(ns, pkey, skv, null);
+            ResultMap<byte[], Result<Long>> im = tair.prefixIncrMulti(ns, pkey, skv, opt);
             assertEquals(ResultCode.OK, im.getCode());
-            for (Map.Entry<byte[], Result<Integer>> e : im.getResult().entrySet()) {
+            for (Map.Entry<byte[], Result<Long>> e : im.getResult().entrySet()) {
                 assertEquals(ResultCode.OK, e.getValue().getCode());
                 assertEquals(value, e.getValue().getResult().intValue());
             }
         } catch (TairRpcError e) {
-            assertEquals(false, true);
             e.printStackTrace();
+            assertEquals(false, true);
         } catch (TairFlowLimit e) {
-            assertEquals(false, true);
             e.printStackTrace();
+            assertEquals(false, true);
         } catch (TairTimeout e) {
-            assertEquals(false, true);
             e.printStackTrace();
+            assertEquals(false, true);
         } catch (InterruptedException e) {
-            assertEquals(false, true);
             e.printStackTrace();
+            assertEquals(false, true);
         }
     }
 }

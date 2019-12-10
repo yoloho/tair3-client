@@ -5,28 +5,28 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import com.taobao.tair3.client.TairClient.Counter;
 import com.taobao.tair3.client.util.TairConstant;
 
-public class BoundedPrefixIncDecRequest  extends PrefixIncDecRequest {
-    public BoundedPrefixIncDecRequest(short ns, byte[] pkey, Map<byte[], Counter> skvs, int lowBound, int upperBound) {
+public class BoundedPrefixIncDecRequest extends PrefixIncDecRequest {
+    public BoundedPrefixIncDecRequest(short ns, byte[] pkey, Map<byte[], Counter> skvs, long lowBound, long upperBound) {
         super(ns, pkey, skvs);
         this.lowBound = lowBound;
         this.upperBound = upperBound;
     }
 
-    protected int lowBound = Integer.MIN_VALUE;
-    protected int upperBound = Integer.MAX_VALUE;
+    protected long lowBound = Long.MIN_VALUE;
+    protected long upperBound = Long.MAX_VALUE;
     
     @Override
     public void encodeTo(ChannelBuffer buffer) {
         super.encodeTo(buffer);
-        buffer.writeInt(lowBound);
-        buffer.writeInt(upperBound);
+        buffer.writeLong(lowBound);
+        buffer.writeLong(upperBound);
     }
     @Override
     public int size() {
-        return super.size() + 4 + 4;
+        return super.size() + 8 + 8;
     }
     
-    public static BoundedPrefixIncDecRequest build(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound) {
+    public static BoundedPrefixIncDecRequest build(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound) {
         if (ns <0 || ns >= TairConstant.NAMESPACE_MAX) {
             throw new IllegalArgumentException(TairConstant.NS_NOT_AVAILABLE);
         }

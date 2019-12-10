@@ -5,9 +5,9 @@ import com.taobao.tair3.client.packets.dataserver.IncDecResponse;
 import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.Result.ResultCode;
 
-public class AddCountCast implements TairResultCast<IncDecResponse, Result<Integer>> {
-    public Result<Integer> cast(IncDecResponse s, Object context) throws TairRpcError {
-        Result<Integer> result = new Result<Integer> ();
+public class AddCountCast implements TairResultCast<IncDecResponse, Result<Long>> {
+    public Result<Long> cast(IncDecResponse s, Object context) throws TairRpcError {
+        Result<Long> result = new Result<Long> ();
         ResultCode code = ResultCode.castResultCode(s.getCode());
         if (code.equals(ResultCode.OK) || code.equals(ResultCode.NOTEXISTS)) {
             result.setResult(s.getValue());

@@ -188,7 +188,7 @@ public class PrefixGet extends TestBase {
         int value = 11;
         int defaultValue = 0;
         try {
-            Result<Integer> r = tair.prefixIncr(ns, pkey, skey, value, defaultValue, opt);
+            Result<Long> r = tair.prefixIncr(ns, pkey, skey, value, defaultValue, opt);
             assertEquals(ResultCode.OK, r.getCode());
 
             TairOption opt = new TairOption(50000, (short)0, 0);

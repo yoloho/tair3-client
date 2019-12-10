@@ -10,27 +10,22 @@ import com.taobao.tair3.client.TairClient.RequestOption;
 import com.taobao.tair3.client.packets.AbstractRequestPacket;
 import com.taobao.tair3.client.util.TairConstant;
 import com.taobao.tair3.client.util.TairUtil;
+import com.taobao.tair3.client.util.TairConstant.MetaFlag;
 
 public class PrefixPutMultiRequest extends AbstractRequestPacket {
     protected short namespace;
     protected byte[] pkey = null;
-    protected Map<byte[], Pair<byte[], RequestOption>> kvs = null; // = new
-                                                                    // HashMap<byte[],
-                                                                    // Pair<byte[],
-                                                                    // RequestOption>>
-                                                                    // ();
-    protected Map<byte[], Pair<byte[], RequestOption>> cvs = null; // = new
-                                                                    // HashMap<byte[],
-                                                                    // Pair<byte[],
-                                                                    // RequestOption>>
-                                                                    // ();
+    // common values
+    protected Map<byte[], Pair<byte[], RequestOption>> values = null;
+    // counters
+    protected Map<byte[], Pair<byte[], RequestOption>> counters = null;
 
     public PrefixPutMultiRequest(short ns, byte[] pkey,
-            Map<byte[], Pair<byte[], RequestOption>> kvs,
-            Map<byte[], Pair<byte[], RequestOption>> cvs) {
+            Map<byte[], Pair<byte[], RequestOption>> values,
+            Map<byte[], Pair<byte[], RequestOption>> counters) {
         this.namespace = ns;
-        this.kvs = kvs;
-        this.cvs = cvs;
+        this.values = values;
+        this.counters = counters;
         this.pkey = pkey;
     }
 
@@ -40,88 +35,71 @@ public class PrefixPutMultiRequest extends AbstractRequestPacket {
         out.writeShort(namespace); // 2
 
         encodeDataMeta(out);
-        out.writeInt(pkey.length + PREFIX_KEY_TYPE.length);
-        out.writeBytes(PREFIX_KEY_TYPE);
-        out.writeBytes(pkey);
+        encodeDataEntry(out, PREFIX_KEY_TYPE, pkey);
         int kvSize = 0;
-        if (kvs != null) {
-            kvSize += kvs.size();
+        if (values != null) {
+            kvSize += values.size();
         }
-        if (cvs != null) {
-            kvSize += cvs.size();
+        if (counters != null) {
+            kvSize += counters.size();
         }
         out.writeInt(kvSize);
-        if (kvs != null) {
-            for (Map.Entry<byte[], Pair<byte[], RequestOption>> entry : kvs
+        if (values != null) {
+            for (Map.Entry<byte[], Pair<byte[], RequestOption>> entry : values
                     .entrySet()) {
                 byte[] skey = entry.getKey();
                 Pair<byte[], RequestOption> value = entry.getValue();
                 if (skey == null || value == null || value.isAvaliable() == false) {
                     throw new IllegalArgumentException(TairConstant.VALUE_NOT_AVAILABLE);
                 }
-                int keySize = pkey.length + PREFIX_KEY_TYPE.length;
-                keySize <<= 22;
-                keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-                
-
+                // key
                 encodeDataMeta(out, value.second().getVersion(), TairUtil.getDuration(value.second().getExpire()));
-                out.writeInt(keySize);
-                out.writeBytes(PREFIX_KEY_TYPE);
-                out.writeBytes(pkey);
-                out.writeBytes(skey);
-
-                encodeDataMeta(out);
-                out.writeInt(value.first().length);
-                out.writeBytes(value.first());
+                encodeKeyOrValueWithoutMeta(out, pkey, skey);
+                // value
+                encodeKeyOrValue(out, value.first());
             }
         }
-        if (cvs != null) {
-            for (Map.Entry<byte[], Pair<byte[], RequestOption>> entry : cvs
+        if (counters != null) {
+            for (Map.Entry<byte[], Pair<byte[], RequestOption>> entry : counters
                     .entrySet()) {
                 byte[] skey = entry.getKey();
                 Pair<byte[], RequestOption> value = entry.getValue();
                 if (skey == null || value == null || value.isAvaliable() == false) {
                     throw new IllegalArgumentException(TairConstant.VALUE_NOT_AVAILABLE);
                 }
-                int keySize = pkey.length + PREFIX_KEY_TYPE.length;
-                keySize <<= 22;
-                keySize |= (pkey.length + skey.length + PREFIX_KEY_TYPE.length);
-
+                // key
                 encodeDataMeta(out, value.second().getVersion(), TairUtil.getDuration(value.second().getExpire()));
-                out.writeInt(keySize);
-                out.writeBytes(PREFIX_KEY_TYPE);
-                out.writeBytes(pkey);
-                out.writeBytes(skey);
-
-                encodeDataMeta(out, TairConstant.TAIR_ITEM_FLAG_ADDCOUNT);
-                out.writeInt(value.first().length);
-                out.writeBytes(value.first());
+                encodeKeyOrValueWithoutMeta(out, pkey, skey);
+                // value
+                encodeKeyOrValue(out, value.first(), MetaFlag.ADD_COUNT);
             }
         }
     }
 
     public int size() {
-        int s = 1 + 2 + 40 + (pkey.length + PREFIX_KEY_TYPE.length) + 4;
-        if (kvs != null) {
-            Iterator<Map.Entry<byte[], Pair<byte[], RequestOption>>> i = kvs
+        int s = 1 + 2;
+        s += keyOrValueEncodedSize(pkey) + PREFIX_KEY_TYPE.length;
+        s += 4; //kv count
+        if (values != null) {
+            Iterator<Map.Entry<byte[], Pair<byte[], RequestOption>>> i = values
                     .entrySet().iterator();
             while (i.hasNext()) {
                 Map.Entry<byte[], Pair<byte[], RequestOption>> entry = i.next();
                 byte[] skey = entry.getKey();
                 Pair<byte[], RequestOption> value = entry.getValue();
-                s += (40 + (pkey.length + skey.length + PREFIX_KEY_TYPE.length));
-                s += (40 + value.first().length);
+                s += keyOrValueEncodedSize(pkey, skey);
+                s += keyOrValueEncodedSize(value.first());
             }
         }
-        if (cvs != null) {
-            Iterator<Map.Entry<byte[], Pair<byte[], RequestOption>>> i = cvs
+        if (counters != null) {
+            Iterator<Map.Entry<byte[], Pair<byte[], RequestOption>>> i = counters
                     .entrySet().iterator();
             while (i.hasNext()) {
                 Map.Entry<byte[], Pair<byte[], RequestOption>> entry = i.next();
                 byte[] skey = entry.getKey();
                 Pair<byte[], RequestOption> value = entry.getValue();
-                s += (40 + (pkey.length + skey.length + PREFIX_KEY_TYPE.length));
-                s += (40 + value.first().length);
+                s += keyOrValueEncodedSize(pkey, skey);
+                s += keyOrValueEncodedSize(value.first());
             }
         }
         return s;

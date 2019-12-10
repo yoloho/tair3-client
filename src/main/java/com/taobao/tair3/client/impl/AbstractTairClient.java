@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.taobao.tair3.client.Result;
 import com.taobao.tair3.client.ResultMap;
 import com.taobao.tair3.client.TairBlockingQueue;
@@ -62,6 +63,7 @@ import com.taobao.tair3.client.rpc.future.TairResultFutureSetImpl;
 import com.taobao.tair3.client.rpc.net.DeamondThreadFactory;
 import com.taobao.tair3.client.util.ByteArray;
 import com.taobao.tair3.client.util.TairConstant;
+import com.taobao.tair3.client.util.TairConstant.MetaFlag;
 import com.taobao.tair3.client.util.TairUtil;
 
 
@@ -99,7 +101,7 @@ public abstract class AbstractTairClient implements TairClient {
     private NioClientSocketChannelFactory nioFactory = defaultNioFactory;
     
     
-    private int maxNotifyQueueSize = 512;
+    private int maxNotifyQueueSize = 1024;
     
     private static TairBlockingQueue notifyQueue = new DefaultTairBlockingQueue(); 
     
@@ -121,9 +123,18 @@ public abstract class AbstractTairClient implements TairClient {
         return notifyQueue;
     }
 
+    /**
+     * Set a customized implementation of notify queue.
+     * 
+     * @param notifyQueueNew
+     */
     public void setNotifyQueue(TairBlockingQueue notifyQueueNew) {
-        notifyQueue.clear();
+        TairBlockingQueue old = notifyQueue;
         notifyQueue = notifyQueueNew;
+        // copy
+        while (old.size() > 0) {
+            notifyQueueNew.offer(old.poll());
+        }
     }
 
     public int getMaxNotifyQueueSize() {
@@ -208,18 +219,24 @@ public abstract class AbstractTairClient implements TairClient {
         defaultNioFactory.shutdown();
     }
 
-    private Future<Result<Void>> putAsyncImpl(short ns, byte[] pkey, byte[] skey, int keyFlag, byte[] value, int valueFlag, TairOption opt) throws TairRpcError, TairFlowLimit {
+    private Future<Result<Void>> putAsyncImpl(short ns, byte[] pkey, byte[] skey, MetaFlag[] keyFlag, byte[] value,
+            MetaFlag[] valueFlag, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (opt == null) {
             opt = defaultOptions;
         }
         //OK!!!
-        PutRequest request = PutRequest.build(ns, pkey, skey, keyFlag, value, valueFlag, opt);
+        PutRequest request = PutRequest.build(ns, pkey, skey, value, opt);
+        if (keyFlag != null && keyFlag.length > 0) {
+            request.setKeyFlag(keyFlag);
+        }
+        if (valueFlag != null && valueFlag.length > 0) {
+            request.setValueFlag(valueFlag);
+        }
         request.setContext((short)(skey != null ? pkey.length : 0));
         SocketAddress addr = null ;
         if (skey != null) {
             addr = tairProcessor.matchDataServer(TairConstant.PREFIX_KEY_TYPE, pkey);
-        }
-        else {
+        } else {
             addr = tairProcessor.matchDataServer(pkey);
         }
         return tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), ReturnResponse.class, TairResultCastFactory.PUT);
@@ -227,9 +244,7 @@ public abstract class AbstractTairClient implements TairClient {
     
     
     public Future<Result<Void>> putAsync(short ns, byte[] key, byte[] value, TairOption opt) throws TairRpcError, TairFlowLimit {
-        //why ?
-        int keyFlag = (opt != null && opt.getRequestOption() != null && opt.getRequestOption().getVersion() != 0)  ? 1 : 0;
-        return putAsyncImpl(ns, key, null, keyFlag, value, 0, opt);
+        return putAsyncImpl(ns, key, null, null, value, null, opt);
     }
     
     private Future<Result<byte[]>> getAsyncImpl(short ns, byte[] pkey, byte[] skey, TairOption opt) throws TairRpcError, TairFlowLimit {
@@ -281,7 +296,7 @@ public abstract class AbstractTairClient implements TairClient {
             byte[] value = entry.getValue();
             SocketAddress addr = tairProcessor.matchDataServer(key);
             //OK!!!
-            PutRequest request = PutRequest.build(ns, key, null, 0, value, 0, opt);
+            PutRequest request = PutRequest.build(ns, key, null, value, opt);
             request.setContext(key);
             TairResultFutureImpl<ReturnResponse, Result<ResultMap<byte[], Result<Void>>>> future = tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), ReturnResponse.class, TairResultCastFactory.BATCH_PUT_OLD);
             futureSet.add(future);
@@ -311,7 +326,7 @@ public abstract class AbstractTairClient implements TairClient {
         return new TairResultFutureSetImpl<GetResponse, byte[], ResultMap<byte[], Result<byte[]>>>(futureSet);
     }
 
-    private Future<Result<Integer>> addCountAsyncImpl(short ns, byte[] pkey, byte[] skey, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
+    private Future<Result<Long>> addCountAsyncImpl(short ns, byte[] pkey, byte[] skey, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (opt == null) 
             opt = defaultOptions;
         //OK!!!
@@ -326,7 +341,7 @@ public abstract class AbstractTairClient implements TairClient {
         return tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), IncDecResponse.class, TairResultCastFactory.ADD_COUNT);
     }
     
-    private Future<Result<Integer>> addCountBoundedAsyncImpl(short ns, byte[] pkey, byte[] skey, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
+    private Future<Result<Long>> addCountBoundedAsyncImpl(short ns, byte[] pkey, byte[] skey, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (opt == null) 
             opt = defaultOptions;
         //OK!!!
@@ -341,22 +356,22 @@ public abstract class AbstractTairClient implements TairClient {
         return tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), IncDecResponse.class, TairResultCastFactory.ADD_COUNT_BOUNDED);
     }
     
-    public Future<Result<Void>> setCountAsync(short ns, byte[] key, int count, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Void>> setCountAsync(short ns, byte[] key, long count, TairOption opt) throws TairRpcError, TairFlowLimit {
         byte[] incValue = TairUtil.encodeCountValue(count);
-        return putAsyncImpl(ns, key, null, 0, incValue, TairConstant.TAIR_ITEM_FLAG_ADDCOUNT, opt);
+        return putAsyncImpl(ns, key, null, null, incValue, new MetaFlag[] { MetaFlag.ADD_COUNT }, opt);
     }
 
-    public Future<Result<Integer>> incrAsync(short ns, byte[] key, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> incrAsync(short ns, byte[] key, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
         return addCountAsyncImpl(ns, key, null, value, defaultValue, opt);
     }
-    public Future<Result<Integer>> incrAsync(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> incrAsync(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
         return addCountBoundedAsyncImpl(ns, key, null, value, defaultValue, lowBound, upperBound, opt);
     }
     
-    public Future<Result<Integer>> decrAsync(short ns, byte[] key, int value, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> decrAsync(short ns, byte[] key, long value, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
         return addCountAsyncImpl(ns, key, null, -value, defaultValue, opt);
     }
-    public Future<Result<Integer>> decrAsync(short ns, byte[] key, int value, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> decrAsync(short ns, byte[] key, long value, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
         return addCountBoundedAsyncImpl(ns, key, null, -value, defaultValue, lowBound, upperBound, opt);
     }
     
@@ -440,7 +455,7 @@ public abstract class AbstractTairClient implements TairClient {
     }
 
     public Future<Result<Void>> prefixPutAsync(short ns, byte[] pkey, byte[] skey, byte[] value, TairOption opt) throws TairRpcError, TairFlowLimit {
-        return putAsyncImpl(ns, pkey, skey, 0, value, 0, opt);
+        return putAsyncImpl(ns, pkey, skey, null, value, null, opt);
     }
     
     private Future<ResultMap<byte[], Result<Void>>> prefixDeleteMultiLocalAsyncImpl(short ns, byte[] pkey, final List<byte[]> skeys, TairOption opt) throws TairRpcError, TairFlowLimit {
@@ -470,12 +485,12 @@ public abstract class AbstractTairClient implements TairClient {
         return getAsyncImpl(ns, pkey, skey, opt);
     }
     
-    public Future<Result<Void>> prefixSetCountAsync(short ns, byte[] pkey, byte[] skey, int count, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Void>> prefixSetCountAsync(short ns, byte[] pkey, byte[] skey, long count, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (skey == null) {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
         byte[] incValue = TairUtil.encodeCountValue(count);
-        return putAsyncImpl(ns, pkey, skey, 0, incValue, TairConstant.TAIR_ITEM_FLAG_ADDCOUNT, opt);
+        return putAsyncImpl(ns, pkey, skey, null, incValue, new MetaFlag[] { MetaFlag.ADD_COUNT }, opt);
     }
     
     public Future<Result<byte[]>> prefixGetHiddenAsync(short ns, byte[] pkey, byte[] skey, TairOption opt) throws TairRpcError, TairFlowLimit {
@@ -485,26 +500,26 @@ public abstract class AbstractTairClient implements TairClient {
         return getHiddenAsyncImpl(ns, pkey, skey, opt);
     }
 
-    public Future<Result<Integer>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, int count, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, long count, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (skey == null) {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
         return addCountAsyncImpl(ns, pkey, skey, count, defaultValue, opt);
     }
-    public Future<Result<Integer>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, int count, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> prefixIncrAsync(short ns, byte[] pkey, byte[] skey, long count, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (skey == null) {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
         return addCountBoundedAsyncImpl(ns, pkey, skey, count, defaultValue, lowBound, upperBound, opt);
     }
     
-    public Future<Result<Integer>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, int count, int defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, long count, long defaultValue, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (skey == null) {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
         return addCountAsyncImpl(ns, pkey, skey, -count, defaultValue, opt);
     }
-    public Future<Result<Integer>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, int count, int defaultValue, int lowBound, int upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
+    public Future<Result<Long>> prefixDecrAsync(short ns, byte[] pkey, byte[] skey, long count, long defaultValue, long lowBound, long upperBound, TairOption opt) throws TairRpcError, TairFlowLimit {
         if (skey == null) {
             throw new IllegalArgumentException(TairConstant.KEY_NOT_AVAILABLE);
         }
@@ -735,9 +750,9 @@ public abstract class AbstractTairClient implements TairClient {
     }
         
     
-    public Future<ResultMap<byte[], Result<Void>>> prefixSetCountMultiAsync(short ns, byte[] pkey, final Map<byte[], Pair<Integer, RequestOption>> kvs, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    public Future<ResultMap<byte[], Result<Void>>> prefixSetCountMultiAsync(short ns, byte[] pkey, final Map<byte[], Pair<Long, RequestOption>> kvs, TairOption opt)  throws TairRpcError, TairFlowLimit {
         Map<byte[], Pair<byte[], RequestOption>> cvs = new HashMap<byte[], Pair<byte[], RequestOption>> (kvs.size());
-        for (Map.Entry<byte[], Pair<Integer, RequestOption>> entry : kvs.entrySet()) {
+        for (Map.Entry<byte[], Pair<Long, RequestOption>> entry : kvs.entrySet()) {
             byte[] incValue = TairUtil.encodeCountValue(entry.getValue().first());
             cvs.put(entry.getKey(), new Pair<byte[], RequestOption> (incValue, entry.getValue().second()));
         }
@@ -840,7 +855,7 @@ public abstract class AbstractTairClient implements TairClient {
 
     }
     
-    private Future<ResultMap<byte[], Result<Integer>>> prefixAddCountMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    private Future<ResultMap<byte[], Result<Long>>> prefixAddCountMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
         if (opt == null) 
             opt = defaultOptions;
         //build request, no need to set the context.
@@ -851,14 +866,14 @@ public abstract class AbstractTairClient implements TairClient {
         request.setContext(context);
 
         SocketAddress addr = tairProcessor.matchDataServer(TairConstant.PREFIX_KEY_TYPE, pkey);
-        TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>> future = tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), PrefixIncDecResponse.class, TairResultCastFactory.PREFIX_ADD_COUNT_MULTI);
+        TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>> future = tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), PrefixIncDecResponse.class, TairResultCastFactory.PREFIX_ADD_COUNT_MULTI);
         //add the future the the set.
-        Set<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>>> futureSet = new HashSet<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>>>();
+        Set<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>>> futureSet = new HashSet<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>>>();
         futureSet.add(future);
         //create the futureSet.
-        return new TairResultFutureSetImpl<PrefixIncDecResponse, Integer, ResultMap<byte[], Result<Integer>>>(futureSet);
+        return new TairResultFutureSetImpl<PrefixIncDecResponse, Long, ResultMap<byte[], Result<Long>>>(futureSet);
     }
-    private Future<ResultMap<byte[], Result<Integer>>> prefixAddCountBoundedMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    private Future<ResultMap<byte[], Result<Long>>> prefixAddCountBoundedMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
         if (opt == null) 
             opt = defaultOptions;
         //build request, no need to set the context.
@@ -869,27 +884,27 @@ public abstract class AbstractTairClient implements TairClient {
         request.setContext(context);
 
         SocketAddress addr = tairProcessor.matchDataServer(TairConstant.PREFIX_KEY_TYPE, pkey);
-        TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>> future = tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), PrefixIncDecResponse.class, TairResultCastFactory.PREFIX_ADD_COUNT_BOUNDED_MULTI);
+        TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>> future = tairProcessor.callDataServerAsync(addr, request, opt.getTimeout(), PrefixIncDecResponse.class, TairResultCastFactory.PREFIX_ADD_COUNT_BOUNDED_MULTI);
         //add the future the the set.
-        Set<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>>> futureSet = new HashSet<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Integer>>>>>();
+        Set<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>>> futureSet = new HashSet<TairResultFutureImpl<PrefixIncDecResponse, Result<ResultMap<byte[], Result<Long>>>>>();
         futureSet.add(future);
         //create the futureSet.
-        return new TairResultFutureSetImpl<PrefixIncDecResponse, Integer, ResultMap<byte[], Result<Integer>>>(futureSet);
+        return new TairResultFutureSetImpl<PrefixIncDecResponse, Long, ResultMap<byte[], Result<Long>>>(futureSet);
     }
-    public Future<ResultMap<byte[], Result<Integer>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    public Future<ResultMap<byte[], Result<Long>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
         return prefixAddCountMultiAsync(ns, pkey, skv, opt);
     }
-    public Future<ResultMap<byte[], Result<Integer>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    public Future<ResultMap<byte[], Result<Long>>> prefixIncrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
         return prefixAddCountBoundedMultiAsync(ns, pkey, skv, lowBound, upperBound, opt);
     }
-    public Future<ResultMap<byte[], Result<Integer>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    public Future<ResultMap<byte[], Result<Long>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, TairOption opt)  throws TairRpcError, TairFlowLimit {
         Map<byte[], Counter> skvTemp = new HashMap<byte[], Counter>();
         for (Map.Entry<byte[], Counter> e : skv.entrySet()) {
             skvTemp.put(e.getKey(), new Counter(-e.getValue().getValue(), e.getValue().getInitValue(), e.getValue().getExpire()));
         }
         return prefixAddCountMultiAsync(ns, pkey, skvTemp, opt);
     }
-    public Future<ResultMap<byte[], Result<Integer>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, int lowBound, int upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
+    public Future<ResultMap<byte[], Result<Long>>> prefixDecrMultiAsync(short ns, byte[] pkey, Map<byte[], Counter> skv, long lowBound, long upperBound, TairOption opt)  throws TairRpcError, TairFlowLimit {
         Map<byte[], Counter> skvTemp = new HashMap<byte[], Counter>();
         for (Map.Entry<byte[], Counter> e : skv.entrySet()) {
             skvTemp.put(e.getKey(), new Counter(-e.getValue().getValue(), e.getValue().getInitValue(), e.getValue().getExpire()));
