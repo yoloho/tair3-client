@@ -25,11 +25,15 @@
         <developerConnection>scm:git:git@github.com:yoloho/tair3-client.git</developerConnection>
         <url>https://github.com/yoloho/tair3-client.git</url>
     </scm>
-    <name>Tair Java Client for Tair 3.x</name>
+    <name>Tair Java Client for Tair 3.3.x</name>
     <groupId>com.yoloho.tair</groupId>
     <artifactId>tair3-client</artifactId>
-    <version>3.1.0</version>
+    <version>3.3.0</version>
     <packaging>jar</packaging>
+    <description><![CDATA[
+        Tair client for tair greater than 3.3.0.
+        See https://github.com/jasonjoo2010/tair/tree/3.3.x#330
+    ]]></description>
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
